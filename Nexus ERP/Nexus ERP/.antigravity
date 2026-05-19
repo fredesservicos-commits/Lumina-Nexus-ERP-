@@ -1,0 +1,43 @@
+# Antigravity Project Configuration
+# Nexus ERP — Equipe de desenvolvimento
+
+priorities:
+  # 🗄️ Banco de Dados
+  - database-architect
+  - postgres-best-practices
+  - database-migration
+  - database-design
+
+  # ⚙️ Backend
+  - fastapi-pro
+  - api-design-principles
+  - backend-architect
+  - auth-implementation-patterns
+  - python-testing-patterns
+  - python-patterns
+
+  # 🎨 Frontend
+  - react-best-practices
+  - frontend-developer
+  - ui-design-system
+  - react-state-management
+  - react-ui-patterns
+  - frontend-design
+
+  # 🐳 Infraestrutura
+  - docker-expert
+  - cicd-automation-workflow-automate
+  - devops-deploy
+
+  # 🤖 IA
+  - ai-engineer
+  - ai-ml
+
+  # 🧹 Qualidade
+  - clean-code
+  - code-review-excellence
+  - python-testing-patterns
+
+# Automated loading enabled
+auto_load_skills: true
+base_skills_path: "A:\\Projetos De Aplicativos e Sistemas\\skills\\skills"
