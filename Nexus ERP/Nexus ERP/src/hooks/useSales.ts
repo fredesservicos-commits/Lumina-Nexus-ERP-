@@ -11,12 +11,9 @@ export function useSales() {
     return api.get<Sale[]>(`/sales/search?q=${encodeURIComponent(q)}`);
   }, []);
 
-  const create = useCallback(
-    async (customer: string, total: number): Promise<Sale> => {
-      return api.post<Sale>("/sales/new", { customer, total });
-    },
-    []
-  );
+  const create = useCallback(async (customer: string, total: number): Promise<Sale> => {
+    return api.post<Sale>("/sales/new", { customer, total });
+  }, []);
 
   return { list, search, create };
 }

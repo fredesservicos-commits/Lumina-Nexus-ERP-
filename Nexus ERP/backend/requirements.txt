@@ -3,6 +3,7 @@ uvicorn[standard]>=0.34.0
 sqlalchemy>=2.0.0
 pydantic>=2.10.0
 pydantic-settings>=2.7.0
+httpx>=0.28.0
 
 # Para PostgreSQL em produção: pip install pg8000
 # pg8000>=1.31.0

@@ -1,41 +1,16 @@
-import uuid
-from datetime import datetime, UTC
-
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.models.database import get_db
-from app.models.operacional import Document, DocumentItem
-from app.models.financeiro import GeneralLedger, LedgerItem
 from app.schemas.sales import SaleCreate, SaleResponse, SaleSearchResult
+from app.services.sales_service import register_sale, list_sales, search_sales
 
 router = APIRouter()
 
 
 @router.post("/new", response_model=SaleResponse)
-def register_sale(data: SaleCreate, db: Session = Depends(get_db)):
-    if data.total <= 0:
-        raise HTTPException(status_code=400, detail="Valor da venda inválido")
-
-    sale_id = str(uuid.uuid4())
-    sale = Document(
-        id=sale_id,
-        doc_type="SALES_ORDER",
-        status="CONFIRMED",
-        total_amount=data.total,
-        description=f"Venda - {data.customer}",
-    )
-    db.add(sale)
-
-    ledger = GeneralLedger(
-        company_id=sale.company_id,
-        description=f"Lançamento automático venda {sale_id[:8]}",
-        reference_doc_id=sale_id,
-    )
-    db.add(ledger)
-    db.commit()
-    db.refresh(sale)
-
+def create_sale(data: SaleCreate, db: Session = Depends(get_db)):
+    sale = register_sale(db, data.customer, data.total)
     return SaleResponse(
         id=sale.id,
         customer=data.customer,
@@ -45,13 +20,8 @@ def register_sale(data: SaleCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/list", response_model=list[SaleResponse])
-def list_sales(db: Session = Depends(get_db)):
-    sales = (
-        db.query(Document)
-        .filter(Document.doc_type == "SALES_ORDER")
-        .order_by(Document.created_at.desc())
-        .all()
-    )
+def get_sales(db: Session = Depends(get_db)):
+    sales = list_sales(db)
     return [
         SaleResponse(
             id=s.id,
@@ -64,14 +34,8 @@ def list_sales(db: Session = Depends(get_db)):
 
 
 @router.get("/search", response_model=list[SaleSearchResult])
-def search_sales(q: str = Query(""), db: Session = Depends(get_db)):
-    sales = (
-        db.query(Document)
-        .filter(Document.doc_type == "SALES_ORDER")
-        .filter(Document.description.ilike(f"%{q}%"))
-        .order_by(Document.created_at.desc())
-        .all()
-    )
+def get_sales_search(q: str = Query(""), db: Session = Depends(get_db)):
+    sales = search_sales(db, q)
     return [
         SaleSearchResult(
             id=s.id,

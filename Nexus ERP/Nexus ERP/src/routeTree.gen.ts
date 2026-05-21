@@ -9,18 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DocumentacaoRouteImport } from './routes/documentacao'
+import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppVendasRouteImport } from './routes/app.vendas'
 import { Route as AppRhRouteImport } from './routes/app.rh'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
+import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
 import { Route as AppComprasRouteImport } from './routes/app.compras'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocumentacaoRoute = DocumentacaoRouteImport.update({
   id: '/documentacao',
   path: '/documentacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -53,6 +66,11 @@ const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
   path: '/relatorios',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppComprasRoute = AppComprasRouteImport.update({
   id: '/compras',
   path: '/compras',
@@ -62,8 +80,11 @@ const AppComprasRoute = AppComprasRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/cadastro': typeof CadastroRoute
   '/documentacao': typeof DocumentacaoRoute
+  '/login': typeof LoginRoute
   '/app/compras': typeof AppComprasRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/rh': typeof AppRhRoute
   '/app/vendas': typeof AppVendasRoute
@@ -71,8 +92,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cadastro': typeof CadastroRoute
   '/documentacao': typeof DocumentacaoRoute
+  '/login': typeof LoginRoute
   '/app/compras': typeof AppComprasRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/rh': typeof AppRhRoute
   '/app/vendas': typeof AppVendasRoute
@@ -82,8 +106,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/cadastro': typeof CadastroRoute
   '/documentacao': typeof DocumentacaoRoute
+  '/login': typeof LoginRoute
   '/app/compras': typeof AppComprasRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/rh': typeof AppRhRoute
   '/app/vendas': typeof AppVendasRoute
@@ -94,8 +121,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/cadastro'
     | '/documentacao'
+    | '/login'
     | '/app/compras'
+    | '/app/financeiro'
     | '/app/relatorios'
     | '/app/rh'
     | '/app/vendas'
@@ -103,8 +133,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cadastro'
     | '/documentacao'
+    | '/login'
     | '/app/compras'
+    | '/app/financeiro'
     | '/app/relatorios'
     | '/app/rh'
     | '/app/vendas'
@@ -113,8 +146,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/cadastro'
     | '/documentacao'
+    | '/login'
     | '/app/compras'
+    | '/app/financeiro'
     | '/app/relatorios'
     | '/app/rh'
     | '/app/vendas'
@@ -124,16 +160,32 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  CadastroRoute: typeof CadastroRoute
   DocumentacaoRoute: typeof DocumentacaoRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/documentacao': {
       id: '/documentacao'
       path: '/documentacao'
       fullPath: '/documentacao'
       preLoaderRoute: typeof DocumentacaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -178,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRelatoriosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/financeiro': {
+      id: '/app/financeiro'
+      path: '/financeiro'
+      fullPath: '/app/financeiro'
+      preLoaderRoute: typeof AppFinanceiroRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/compras': {
       id: '/app/compras'
       path: '/compras'
@@ -190,6 +249,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppComprasRoute: typeof AppComprasRoute
+  AppFinanceiroRoute: typeof AppFinanceiroRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
   AppRhRoute: typeof AppRhRoute
   AppVendasRoute: typeof AppVendasRoute
@@ -198,6 +258,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppComprasRoute: AppComprasRoute,
+  AppFinanceiroRoute: AppFinanceiroRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
   AppRhRoute: AppRhRoute,
   AppVendasRoute: AppVendasRoute,
@@ -209,7 +270,9 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  CadastroRoute: CadastroRoute,
   DocumentacaoRoute: DocumentacaoRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

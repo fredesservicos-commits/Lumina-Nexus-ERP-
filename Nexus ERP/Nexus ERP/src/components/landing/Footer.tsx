@@ -13,8 +13,8 @@ export function Footer() {
               <span className="text-base font-bold">Nexus ERP</span>
             </a>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-              ERP brasileiro com rigor contábil estilo SAP e inteligência operacional
-              por IA. Construído para gestores que exigem precisão.
+              ERP brasileiro com rigor contábil estilo SAP e inteligência operacional por IA.
+              Construído para gestores que exigem precisão.
             </p>
             <div className="mt-5 flex items-center gap-3">
               {[Linkedin, Twitter, Github].map((Icon, i) => (
@@ -66,13 +66,7 @@ export function Footer() {
   );
 }
 
-function FooterCol({
-  title,
-  links,
-}: {
-  title: string;
-  links: { l: string; h: string }[];
-}) {
+function FooterCol({ title, links }: { title: string; links: { l: string; h: string }[] }) {
   return (
     <div>
       <h4 className="text-sm font-semibold">{title}</h4>

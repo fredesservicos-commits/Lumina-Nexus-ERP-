@@ -12,31 +12,29 @@ export function Fase2Content() {
   return (
     <DocSection>
       <DocP>
-        Para que o sistema saia do "papel" (código de simulação) e funcione em
-        cenário real, conectamos o <strong className="text-foreground">Endpoint</strong>{" "}
-        (porta de entrada) ao <strong className="text-foreground">Banco de Dados Real</strong>{" "}
-        (cofre de informações).
+        Para que o sistema saia do "papel" (código de simulação) e funcione em cenário real,
+        conectamos o <strong className="text-foreground">Endpoint</strong> (porta de entrada) ao{" "}
+        <strong className="text-foreground">Banco de Dados Real</strong> (cofre de informações).
       </DocP>
 
       <DocH3>1. O que é o quê nessa engrenagem?</DocH3>
       <DocList
         items={[
           <>
-            <strong className="text-foreground">Banco de Dados Real (PostgreSQL):</strong>{" "}
-            software rodando em um servidor que guarda as tabelas permanentemente.
-            Mesmo com o computador desligado, os dados continuam lá.
+            <strong className="text-foreground">Banco de Dados Real (PostgreSQL):</strong> software
+            rodando em um servidor que guarda as tabelas permanentemente. Mesmo com o computador
+            desligado, os dados continuam lá.
           </>,
           <>
-            <strong className="text-foreground">Endpoint (API):</strong> endereço
-            (ex.: <code className="font-mono text-primary">meusistema.com/vendas</code>) que
-            recebe ordens. É o intermediário.
+            <strong className="text-foreground">Endpoint (API):</strong> endereço (ex.:{" "}
+            <code className="font-mono text-primary">meusistema.com/vendas</code>) que recebe
+            ordens. É o intermediário.
           </>,
           <>
-            <strong className="text-foreground">Driver (a ponte):</strong> para o
-            Python falar com o PostgreSQL usamos{" "}
-            <code className="font-mono text-primary">SQLAlchemy</code> ou{" "}
-            <code className="font-mono text-primary">psycopg2</code>. Eles traduzem o
-            código para a linguagem do banco.
+            <strong className="text-foreground">Driver (a ponte):</strong> para o Python falar com o
+            PostgreSQL usamos <code className="font-mono text-primary">SQLAlchemy</code> ou{" "}
+            <code className="font-mono text-primary">psycopg2</code>. Eles traduzem o código para a
+            linguagem do banco.
           </>,
         ]}
       />
@@ -45,25 +43,36 @@ export function Fase2Content() {
       <DocList
         ordered
         items={[
-          <>O <strong className="text-foreground">usuário</strong> clica em "Salvar Venda" na tela.</>,
-          <>O <strong className="text-foreground">front-end</strong> envia um pacote de dados (JSON) para o endpoint.</>,
-          <>O <strong className="text-foreground">endpoint</strong> recebe, valida (estoque e crédito) e abre uma transação.</>,
-          <>O <strong className="text-foreground">banco de dados</strong> grava a informação e responde "Ok".</>,
-          <>O <strong className="text-foreground">endpoint</strong> responde para o usuário: "Venda realizada com sucesso!".</>,
+          <>
+            O <strong className="text-foreground">usuário</strong> clica em "Salvar Venda" na tela.
+          </>,
+          <>
+            O <strong className="text-foreground">front-end</strong> envia um pacote de dados (JSON)
+            para o endpoint.
+          </>,
+          <>
+            O <strong className="text-foreground">endpoint</strong> recebe, valida (estoque e
+            crédito) e abre uma transação.
+          </>,
+          <>
+            O <strong className="text-foreground">banco de dados</strong> grava a informação e
+            responde "Ok".
+          </>,
+          <>
+            O <strong className="text-foreground">endpoint</strong> responde para o usuário: "Venda
+            realizada com sucesso!".
+          </>,
         ]}
       />
 
       <DocH3>3. Código prático: Endpoint conectado ao banco real</DocH3>
       <DocP>
-        Usamos <strong className="text-foreground">SQLAlchemy</strong> — padrão de
-        mercado que garante a qualidade SAP e evita SQL Injection.
+        Usamos <strong className="text-foreground">SQLAlchemy</strong> — padrão de mercado que
+        garante a qualidade SAP e evita SQL Injection.
       </DocP>
 
       <DocH4>Passo A: Instalar as ferramentas</DocH4>
-      <CodeBlock
-        language="bash"
-        code={`pip install fastapi uvicorn sqlalchemy psycopg2-binary`}
-      />
+      <CodeBlock language="bash" code={`pip install fastapi uvicorn sqlalchemy psycopg2-binary`} />
 
       <DocH4>Passo B: Conexão e gravação</DocH4>
       <CodeBlock
@@ -124,24 +133,21 @@ def save_sale(customer: str, value: float, db: Session = Depends(get_db)):
 
       <DocH4>A. Atomicidade (tudo ou nada)</DocH4>
       <DocP>
-        No Nexus, quando você faz uma compra, o sistema deve: (1) aumentar o
-        estoque, (2) criar a conta a pagar, (3) gerar o lançamento contábil. Com
-        o banco real, se o passo 3 falhar, os passos 1 e 2 são cancelados
-        automaticamente (rollback). Essa é a robustez SAP.
+        No Nexus, quando você faz uma compra, o sistema deve: (1) aumentar o estoque, (2) criar a
+        conta a pagar, (3) gerar o lançamento contábil. Com o banco real, se o passo 3 falhar, os
+        passos 1 e 2 são cancelados automaticamente (rollback). Essa é a robustez SAP.
       </DocP>
 
       <DocH4>B. Performance</DocH4>
       <DocP>
-        O PostgreSQL aguenta milhões de vendas por dia sem ficar lento,
-        garantindo que a rentabilidade da empresa não seja prejudicada por
-        sistema travado.
+        O PostgreSQL aguenta milhões de vendas por dia sem ficar lento, garantindo que a
+        rentabilidade da empresa não seja prejudicada por sistema travado.
       </DocP>
 
       <DocH4>C. Segurança</DocH4>
       <DocP>
-        O endpoint garante que ninguém mexa no banco sem permissão. Você coloca
-        uma camada de login (OAuth2) no endpoint e o banco fica "escondido"
-        atrás dele.
+        O endpoint garante que ninguém mexa no banco sem permissão. Você coloca uma camada de login
+        (OAuth2) no endpoint e o banco fica "escondido" atrás dele.
       </DocP>
 
       <DocH3>5. O que você precisa para testar agora?</DocH3>
@@ -149,14 +155,19 @@ def save_sale(customer: str, value: float, db: Session = Depends(get_db)):
         ordered
         items={[
           <>Instalar o PostgreSQL no seu computador (ou usar um serviço de nuvem).</>,
-          <>Configurar a URL de conexão (<code className="font-mono text-primary">DATABASE_URL</code>) no código acima.</>,
-          <>Executar o código e testar via Postman ou pela documentação do FastAPI em <code className="font-mono text-primary">http://localhost:8000/docs</code>.</>,
+          <>
+            Configurar a URL de conexão (
+            <code className="font-mono text-primary">DATABASE_URL</code>) no código acima.
+          </>,
+          <>
+            Executar o código e testar via Postman ou pela documentação do FastAPI em{" "}
+            <code className="font-mono text-primary">http://localhost:8000/docs</code>.
+          </>,
         ]}
       />
 
       <Callout title="Próximo passo" variant="info">
-        A Fase 3 automatiza tudo isso com Docker — banco e dependências sobem
-        com um único comando.
+        A Fase 3 automatiza tudo isso com Docker — banco e dependências sobem com um único comando.
       </Callout>
     </DocSection>
   );

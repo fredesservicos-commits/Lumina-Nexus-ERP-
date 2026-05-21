@@ -45,9 +45,7 @@ export function FAQ() {
     <section id="faq" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-            FAQ
-          </span>
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary">FAQ</span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Perguntas <span className="text-gradient">frequentes</span>
           </h2>

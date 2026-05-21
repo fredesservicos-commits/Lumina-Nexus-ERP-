@@ -7,12 +7,13 @@ export function usePurchases() {
     return api.get<Purchase[]>("/purchases/list");
   }, []);
 
-  const create = useCallback(
-    async (item_name: string, total: number): Promise<Purchase> => {
-      return api.post<Purchase>("/purchases/new", { item_name, total });
-    },
-    []
-  );
+  const search = useCallback(async (q: string): Promise<Purchase[]> => {
+    return api.get<Purchase[]>(`/purchases/search?q=${encodeURIComponent(q)}`);
+  }, []);
 
-  return { list, create };
+  const create = useCallback(async (item_name: string, total: number): Promise<Purchase> => {
+    return api.post<Purchase>("/purchases/new", { item_name, total });
+  }, []);
+
+  return { list, search, create };
 }

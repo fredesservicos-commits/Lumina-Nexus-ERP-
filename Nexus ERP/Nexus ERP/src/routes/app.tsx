@@ -1,5 +1,7 @@
-import { Outlet, Link, useLocation } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -8,6 +10,8 @@ import {
   BarChart3,
   ArrowLeft,
   Sparkles,
+  LogOut,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +20,7 @@ const NAV_ITEMS = [
   { label: "Vendas", href: "/app/vendas", icon: ShoppingCart },
   { label: "Compras", href: "/app/compras", icon: Package },
   { label: "RH", href: "/app/rh", icon: Users },
+  { label: "Financeiro", href: "/app/financeiro", icon: DollarSign },
   { label: "Relatórios", href: "/app/relatorios", icon: BarChart3 },
 ];
 
@@ -25,6 +30,20 @@ export const Route = createFileRoute("/app")({
 
 function AppLayout() {
   const { pathname } = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate({ to: "/login" });
+    }
+  }, [user, navigate]);
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  if (!user) return null;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -48,7 +67,7 @@ function AppLayout() {
                   "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                   isActive
                     ? "bg-primary/10 text-primary shadow-sm"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -58,7 +77,17 @@ function AppLayout() {
           })}
         </nav>
 
-        <div className="border-t border-white/5 p-3">
+        <div className="border-t border-white/5 p-3 space-y-2">
+          <div className="px-3 py-2">
+            <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sair
+          </button>
           <Link
             to="/"
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"

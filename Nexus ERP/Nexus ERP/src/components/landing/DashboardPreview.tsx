@@ -1,4 +1,12 @@
-import { ArrowDownRight, ArrowUpRight, DollarSign, Package2, Users2, Wallet, Percent } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  DollarSign,
+  Package2,
+  Users2,
+  Wallet,
+  Percent,
+} from "lucide-react";
 
 const kpis = [
   { label: "Receita", value: "R$ 1.248.300", trend: "+18,4%", up: true, icon: DollarSign },
@@ -22,14 +30,14 @@ export function DashboardPreview() {
             O pulso da sua empresa em <span className="text-gradient">tempo real</span>
           </h2>
           <p className="mt-6 text-lg text-muted-foreground/80">
-            Números auditáveis, extraídos diretamente do ledger contábil. A precisão
-            do SAP com a agilidade da era da IA.
+            Números auditáveis, extraídos diretamente do ledger contábil. A precisão do SAP com a
+            agilidade da era da IA.
           </p>
         </div>
 
         <div className="relative mt-16">
           <div className="absolute -inset-4 rounded-3xl bg-primary/10 opacity-20 blur-3xl pointer-events-none" />
-          
+
           <div className="relative rounded-3xl border border-white/5 bg-card/10 p-4 shadow-2xl backdrop-blur-3xl sm:p-8 lg:p-10">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {kpis.map((k, i) => {
@@ -46,14 +54,18 @@ export function DashboardPreview() {
                       </div>
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          k.up ? "bg-success/10 text-success border border-success/20" : "bg-warning/10 text-warning border border-warning/20"
+                          k.up
+                            ? "bg-success/10 text-success border border-success/20"
+                            : "bg-warning/10 text-warning border border-warning/20"
                         }`}
                       >
                         <Trend className="mr-0.5 h-3 w-3" />
                         {k.trend}
                       </span>
                     </div>
-                    <div className="mt-5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{k.label}</div>
+                    <div className="mt-5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                      {k.label}
+                    </div>
                     <div className="mt-1 text-xl font-bold tracking-tight">{k.value}</div>
                   </div>
                 );
@@ -64,8 +76,12 @@ export function DashboardPreview() {
               <div className="rounded-2xl border border-white/5 bg-background/20 p-6 lg:col-span-2">
                 <div className="mb-8 flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-bold uppercase tracking-widest">Performance Consolidada</h4>
-                    <p className="text-xs text-muted-foreground">Receita vs Custos Operacionais (2025)</p>
+                    <h4 className="text-sm font-bold uppercase tracking-widest">
+                      Performance Consolidada
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Receita vs Custos Operacionais (2025)
+                    </p>
                   </div>
                   <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-[0.1em]">
                     <span className="flex items-center gap-2">
@@ -78,7 +94,7 @@ export function DashboardPreview() {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex h-52 items-end gap-3">
                   {Array.from({ length: 12 }).map((_, i) => {
                     const r = 40 + ((i * 7) % 55);
@@ -94,7 +110,7 @@ export function DashboardPreview() {
                           style={{ height: `${c}%` }}
                         />
                         <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-card px-2 py-1 rounded text-[10px] border border-white/10 z-10 whitespace-nowrap">
-                          Mês {i+1}
+                          Mês {i + 1}
                         </div>
                       </div>
                     );
@@ -105,7 +121,7 @@ export function DashboardPreview() {
               <div className="rounded-2xl border border-white/5 bg-background/20 p-6">
                 <h4 className="text-sm font-bold uppercase tracking-widest">Alocação de Capital</h4>
                 <p className="mb-8 text-xs text-muted-foreground">Principais rubricas de despesa</p>
-                
+
                 <div className="space-y-6">
                   {[
                     { l: "Compras & Mercadorias", v: 56, c: "bg-primary" },
@@ -114,13 +130,15 @@ export function DashboardPreview() {
                   ].map((b) => (
                     <div key={b.l} className="group">
                       <div className="mb-2 flex justify-between items-end">
-                        <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">{b.l}</span>
+                        <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                          {b.l}
+                        </span>
                         <span className="text-sm font-bold">{b.v}%</span>
                       </div>
                       <div className="h-2 overflow-hidden rounded-full bg-white/5 border border-white/5">
-                        <div 
-                          className={`h-full ${b.c} transition-all duration-1000 group-hover:brightness-125 shadow-glow`} 
-                          style={{ width: `${b.v}%` }} 
+                        <div
+                          className={`h-full ${b.c} transition-all duration-1000 group-hover:brightness-125 shadow-glow`}
+                          style={{ width: `${b.v}%` }}
                         />
                       </div>
                     </div>

@@ -6,3 +6,5 @@ __pycache__/
 *.db
 *.db-journal
 nexus_erp.db
+*.txt
+*.log

@@ -43,23 +43,23 @@
   --radius: 0.8rem;
 
   /* Surfaces - even deeper and more neutral */
-  --background: oklch(0.12 0.015 260);          /* Deeper #080B14 */
+  --background: oklch(0.12 0.015 260); /* Deeper #080B14 */
   --foreground: oklch(0.98 0.005 250);
-  --card: oklch(0.16 0.02 260 / 0.7);           /* Translucent card base */
+  --card: oklch(0.16 0.02 260 / 0.7); /* Translucent card base */
   --card-foreground: oklch(0.98 0.005 250);
   --popover: oklch(0.14 0.018 260);
   --popover-foreground: oklch(0.98 0.005 250);
 
   /* Brand - more vibrant and "electric" */
-  --primary: oklch(0.68 0.24 255);              /* Electric Cobalt */
+  --primary: oklch(0.68 0.24 255); /* Electric Cobalt */
   --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.7 0.28 290);               /* Indigo/Violet Glow */
+  --primary-glow: oklch(0.7 0.28 290); /* Indigo/Violet Glow */
 
   --secondary: oklch(0.2 0.025 260);
   --secondary-foreground: oklch(0.9 0.01 250);
   --muted: oklch(0.18 0.02 260);
   --muted-foreground: oklch(0.65 0.02 260);
-  --accent: oklch(0.7 0.28 290);                /* Purple accent */
+  --accent: oklch(0.7 0.28 290); /* Purple accent */
   --accent-foreground: oklch(0.99 0 0);
 
   --destructive: oklch(0.55 0.22 25);
@@ -80,21 +80,13 @@
     oklch(0.7 0.28 290 / 0.12) 40%,
     transparent 80%
   );
-  --gradient-card: linear-gradient(
-    145deg,
-    oklch(1 0 0 / 0.08) 0%,
-    oklch(1 0 0 / 0.02) 100%
-  );
+  --gradient-card: linear-gradient(145deg, oklch(1 0 0 / 0.08) 0%, oklch(1 0 0 / 0.02) 100%);
 
   /* Shadows - Layered for realism */
   --shadow-glow: 0 0 50px -5px oklch(0.68 0.24 255 / 0.4);
   --shadow-glow-purple: 0 0 60px -10px oklch(0.7 0.28 290 / 0.35);
-  --shadow-elegant: 
-    0 10px 30px -10px oklch(0 0 0 / 0.8),
-    0 4px 10px -5px oklch(1 0 0 / 0.1);
-  --shadow-card: 
-    0 0 0 1px oklch(1 0 0 / 0.05),
-    0 10px 40px -15px oklch(0 0 0 / 0.7);
+  --shadow-elegant: 0 10px 30px -10px oklch(0 0 0 / 0.8), 0 4px 10px -5px oklch(1 0 0 / 0.1);
+  --shadow-card: 0 0 0 1px oklch(1 0 0 / 0.05), 0 10px 40px -15px oklch(0 0 0 / 0.7);
 
   /* Transitions */
   --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -121,7 +113,7 @@
 
   /* Improved Grid Background */
   .bg-grid {
-    background-image: 
+    background-image:
       linear-gradient(to right, oklch(1 0 0 / 0.03) 1px, transparent 1px),
       linear-gradient(to bottom, oklch(1 0 0 / 0.03) 1px, transparent 1px);
     background-size: 64px 64px;
@@ -160,9 +152,15 @@
   }
 
   @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
   }
 
   .animate-float {

@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Database, Plug, Container, Layout, RefreshCw, LayoutDashboard, Sparkles, Lock } from "lucide-react";
+import {
+  ArrowLeft,
+  Database,
+  Plug,
+  Container,
+  Layout,
+  RefreshCw,
+  LayoutDashboard,
+  Sparkles,
+  Lock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Fase1Content } from "@/components/docs/Fase1Content";
 import { Fase2Content } from "@/components/docs/Fase2Content";
@@ -133,8 +143,8 @@ function DocumentacaoPage() {
             As <span className="text-gradient">6 Fases</span> de construção
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground/80 leading-relaxed">
-            Do banco de dados à inteligência artificial — uma jornada técnica em camadas,
-            aplicando o rigor do padrão SAP com tecnologias modernas.
+            Do banco de dados à inteligência artificial — uma jornada técnica em camadas, aplicando
+            o rigor do padrão SAP com tecnologias modernas.
           </p>
         </div>
       </section>
@@ -176,7 +186,7 @@ function DocumentacaoPage() {
                         PHASE {t.n}
                       </span>
                     </div>
-                    
+
                     <div className="mt-3">
                       <div className="text-[13px] font-bold uppercase tracking-wide">{t.title}</div>
                       <div className="mt-0.5 truncate text-[11px] text-muted-foreground/60 group-hover:text-muted-foreground transition-colors">

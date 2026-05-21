@@ -11,7 +11,7 @@ export function Hero() {
         style={{ background: "var(--gradient-hero)" }}
         aria-hidden
       />
-      
+
       {/* Animated background blobs for depth */}
       <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-primary/10 blur-[120px] animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-accent/10 blur-[150px] animate-pulse [animation-delay:2s]" />
@@ -28,15 +28,13 @@ export function Hero() {
             </div>
 
             <h1 className="mt-8 text-5xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-              O ERP que une{" "}
-              <span className="text-gradient">rigor contábil</span> com{" "}
+              O ERP que une <span className="text-gradient">rigor contábil</span> com{" "}
               <span className="text-gradient">IA operacional</span>
             </h1>
 
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground/90 sm:text-xl">
-              Visão de 100% da empresa — Financeiro, Compras, Vendas, RH e Estoque
-              integrados com partidas dobradas e automação inteligente. Estrutura SAP,
-              feita para o Brasil.
+              Visão de 100% da empresa — Financeiro, Compras, Vendas, RH e Estoque integrados com
+              partidas dobradas e automação inteligente. Estrutura SAP, feita para o Brasil.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
@@ -66,8 +64,12 @@ export function Hero() {
                 { v: "IA", l: "Auto-lançamento NF-e" },
               ].map((s) => (
                 <div key={s.l} className="group cursor-default">
-                  <dt className="text-3xl font-bold text-gradient transition-all group-hover:scale-110 origin-left">{s.v}</dt>
-                  <dd className="mt-1 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">{s.l}</dd>
+                  <dt className="text-3xl font-bold text-gradient transition-all group-hover:scale-110 origin-left">
+                    {s.v}
+                  </dt>
+                  <dd className="mt-1 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                    {s.l}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -119,10 +121,7 @@ export function Hero() {
                   </div>
                   <div className="flex h-32 items-end gap-2">
                     {[30, 45, 38, 60, 52, 70, 62, 80, 75, 85, 78, 100].map((h, i) => (
-                      <div
-                        key={i}
-                        className="group relative flex-1"
-                      >
+                      <div key={i} className="group relative flex-1">
                         <div
                           className="w-full rounded-t-sm bg-gradient-to-t from-primary/20 to-primary transition-all duration-500 hover:brightness-125"
                           style={{ height: `${h}%` }}
@@ -145,7 +144,9 @@ export function Hero() {
                     <span className="text-xs font-bold">NF-e</span>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Última Leitura</div>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Última Leitura
+                    </div>
                     <div className="text-xs font-semibold">Nota #8942 — R$ 4.290</div>
                   </div>
                 </div>
@@ -156,7 +157,9 @@ export function Hero() {
               <div className="glass rounded-xl p-4 shadow-glow">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <div className="text-[10px] font-bold uppercase tracking-widest">IA Nexus Ativa</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest">
+                    IA Nexus Ativa
+                  </div>
                 </div>
               </div>
             </div>
@@ -189,7 +192,9 @@ function MiniCard({
       >
         {icon}
       </div>
-      <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">{label}</div>
+      <div className="mt-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+        {label}
+      </div>
       <div className="mt-1 text-xl font-extrabold tracking-tight">{value}</div>
       <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-success">
         <TrendingUp className="h-3 w-3" />

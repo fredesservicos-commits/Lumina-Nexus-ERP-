@@ -13,18 +13,16 @@ export function Fase4Content() {
     <DocSection>
       <DocP>
         Para que o sistema comece a ganhar "vida" visualmente, criamos uma página{" "}
-        <strong className="text-foreground">Frontend</strong> simples e moderna
-        usando HTML, CSS e JavaScript puro (sem instalar nada extra) para
-        conversar com o Backend Python. Antes, é preciso um pequeno ajuste no{" "}
-        <code className="font-mono text-primary">main.py</code> para liberar a
-        comunicação do navegador (<strong className="text-foreground">CORS</strong>).
+        <strong className="text-foreground">Frontend</strong> simples e moderna usando HTML, CSS e
+        JavaScript puro (sem instalar nada extra) para conversar com o Backend Python. Antes, é
+        preciso um pequeno ajuste no <code className="font-mono text-primary">main.py</code> para
+        liberar a comunicação do navegador (<strong className="text-foreground">CORS</strong>).
       </DocP>
 
       <DocH3>Passo 1: Ajuste no Backend (CORS)</DocH3>
       <DocP>
-        Adicione estas linhas ao seu arquivo{" "}
-        <code className="font-mono text-primary">main.py</code> para o Frontend
-        conseguir conversar com o Backend.
+        Adicione estas linhas ao seu arquivo <code className="font-mono text-primary">main.py</code>{" "}
+        para o Frontend conseguir conversar com o Backend.
       </DocP>
 
       <CodeBlock
@@ -48,16 +46,15 @@ app.add_middleware(
       />
 
       <Callout title="Atenção em produção" variant="warning">
-        Em produção, troque <code className="font-mono">allow_origins=["*"]</code>{" "}
-        pela lista exata de domínios autorizados (ex.:{" "}
+        Em produção, troque <code className="font-mono">allow_origins=["*"]</code> pela lista exata
+        de domínios autorizados (ex.:{" "}
         <code className="font-mono">["https://nexus.suaempresa.com.br"]</code>).
       </Callout>
 
       <DocH3>Passo 2: O Frontend (index.html)</DocH3>
       <DocP>
-        Crie um arquivo <code className="font-mono text-primary">index.html</code>{" "}
-        na mesma pasta. O estilo é "Clean Microsoft", para dar cara de
-        praticidade.
+        Crie um arquivo <code className="font-mono text-primary">index.html</code> na mesma pasta. O
+        estilo é "Clean Microsoft", para dar cara de praticidade.
       </DocP>
 
       <CodeBlock
@@ -146,21 +143,21 @@ app.add_middleware(
         ordered
         items={[
           <>
-            <strong className="text-foreground">Ligue o Banco:</strong> no
-            terminal, rode <code className="font-mono text-primary">docker compose up -d</code>.
+            <strong className="text-foreground">Ligue o Banco:</strong> no terminal, rode{" "}
+            <code className="font-mono text-primary">docker compose up -d</code>.
           </>,
           <>
-            <strong className="text-foreground">Ligue o Backend:</strong> no
-            terminal, rode <code className="font-mono text-primary">uvicorn main:app --reload</code>.
+            <strong className="text-foreground">Ligue o Backend:</strong> no terminal, rode{" "}
+            <code className="font-mono text-primary">uvicorn main:app --reload</code>.
           </>,
           <>
-            <strong className="text-foreground">Abra o Frontend:</strong> dê dois
-            cliques no arquivo <code className="font-mono text-primary">index.html</code>.
+            <strong className="text-foreground">Abra o Frontend:</strong> dê dois cliques no arquivo{" "}
+            <code className="font-mono text-primary">index.html</code>.
           </>,
           <>
-            <strong className="text-foreground">Ação:</strong> digite nome e
-            valor, clique no botão. O JavaScript envia para o Python, o Python
-            valida e grava no PostgreSQL, o banco confirma e você recebe o alerta.
+            <strong className="text-foreground">Ação:</strong> digite nome e valor, clique no botão.
+            O JavaScript envia para o Python, o Python valida e grava no PostgreSQL, o banco
+            confirma e você recebe o alerta.
           </>,
         ]}
       />
@@ -169,37 +166,36 @@ app.add_middleware(
       <DocList
         items={[
           <>
-            <strong className="text-foreground">Fim da teoria:</strong> agora você
-            tem um sistema real. Digite uma venda, feche tudo, reinicie o
-            computador, olhe no banco — a venda continua lá.
+            <strong className="text-foreground">Fim da teoria:</strong> agora você tem um sistema
+            real. Digite uma venda, feche tudo, reinicie o computador, olhe no banco — a venda
+            continua lá.
           </>,
           <>
-            <strong className="text-foreground">Qualidade visual:</strong> o
-            formulário é simples, mas segue o padrão de praticidade.
+            <strong className="text-foreground">Qualidade visual:</strong> o formulário é simples,
+            mas segue o padrão de praticidade.
           </>,
           <>
-            <strong className="text-foreground">Fundação de ERP:</strong> você pode
-            duplicar esse <code className="font-mono text-primary">index.html</code>{" "}
-            para criar as telas de Compras e RH usando a mesma lógica.
+            <strong className="text-foreground">Fundação de ERP:</strong> você pode duplicar esse{" "}
+            <code className="font-mono text-primary">index.html</code> para criar as telas de
+            Compras e RH usando a mesma lógica.
           </>,
         ]}
       />
 
       <DocH3>Próximo passo sugerido</DocH3>
       <DocP>
-        Adicionar a funcionalidade <strong className="text-foreground">"Listar Vendas"</strong>{" "}
-        — popular a tabela automaticamente ao carregar a página, dando o toque
-        final de "sistema vivo". Isso requer um endpoint{" "}
-        <code className="font-mono text-primary">GET /sales</code> no{" "}
+        Adicionar a funcionalidade <strong className="text-foreground">"Listar Vendas"</strong> —
+        popular a tabela automaticamente ao carregar a página, dando o toque final de "sistema
+        vivo". Isso requer um endpoint <code className="font-mono text-primary">GET /sales</code> no{" "}
         <code className="font-mono text-primary">main.py</code> e uma chamada{" "}
         <code className="font-mono text-primary">fetch</code> dentro de{" "}
         <code className="font-mono text-primary">carregarVendas()</code>.
       </DocP>
 
       <Callout title="Roadmap completo entregue" variant="success">
-        Com as Fases 1 a 4 implementadas, o Nexus ERP tem banco persistente,
-        backend com regras, ambiente dockerizado e interface conectada — um
-        ciclo completo Front → Back → Banco funcionando.
+        Com as Fases 1 a 4 implementadas, o Nexus ERP tem banco persistente, backend com regras,
+        ambiente dockerizado e interface conectada — um ciclo completo Front → Back → Banco
+        funcionando.
       </Callout>
     </DocSection>
   );

@@ -60,9 +60,7 @@ export function Pricing() {
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Escolha o plano que <span className="text-gradient">acompanha sua empresa</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Sem taxas escondidas. Cancele quando quiser.
-          </p>
+          <p className="mt-4 text-muted-foreground">Sem taxas escondidas. Cancele quando quiser.</p>
         </div>
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">

@@ -32,8 +32,7 @@ export function Differentials() {
             Por que Nexus
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            Construído para quem leva{" "}
-            <span className="text-gradient">contabilidade a sério</span>
+            Construído para quem leva <span className="text-gradient">contabilidade a sério</span>
           </h2>
         </div>
 
@@ -47,9 +46,7 @@ export function Differentials() {
               >
                 <Icon className="h-6 w-6 text-accent" />
                 <h3 className="mt-4 text-base font-semibold">{it.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {it.desc}
-                </p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{it.desc}</p>
               </div>
             );
           })}

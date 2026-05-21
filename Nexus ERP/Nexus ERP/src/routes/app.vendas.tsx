@@ -16,15 +16,18 @@ function VendasPage() {
   const [query, setQuery] = useState("");
   const [customer, setCustomer] = useState("");
   const [value, setValue] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const loadSales = async () => {
+    setLoading(true);
     const data = query ? await search(query) : await list();
     setSales(data);
+    setLoading(false);
   };
 
   useEffect(() => {
     loadSales();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async () => {
     if (!customer || !value) return;
@@ -42,9 +45,7 @@ function VendasPage() {
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Vendas</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Registre e consulte suas vendas
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Registre e consulte suas vendas</p>
       </div>
 
       <div className="mb-8 rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-sm">
@@ -83,49 +84,52 @@ function VendasPage() {
         </Button>
       </div>
 
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/5">
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Cliente
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Valor
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Data
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {sales.map((sale) => (
-              <tr key={sale.id} className="hover:bg-white/5 transition-colors">
-                <td className="px-6 py-4 text-sm">{sale.customer}</td>
-                <td className="px-6 py-4 text-sm font-medium">
-                  {new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(sale.total)}
-                </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {new Date(sale.created_at).toLocaleDateString("pt-BR")}
-                </td>
+      {loading ? (
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Cliente
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Valor
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Data
+                </th>
               </tr>
-            ))}
-            {sales.length === 0 && (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-12 text-center text-sm text-muted-foreground"
-                >
-                  Nenhuma venda registrada
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {sales.map((sale) => (
+                <tr key={sale.id} className="hover:bg-white/5 transition-colors">
+                  <td className="px-6 py-4 text-sm">{sale.customer}</td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(sale.total)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">
+                    {new Date(sale.created_at).toLocaleDateString("pt-BR")}
+                  </td>
+                </tr>
+              ))}
+              {sales.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                    Nenhuma venda registrada
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

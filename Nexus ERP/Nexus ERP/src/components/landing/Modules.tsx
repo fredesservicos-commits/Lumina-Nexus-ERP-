@@ -53,12 +53,11 @@ export function Modules() {
             Arquitetura de Dados
           </div>
           <h2 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Seis módulos. Uma única{" "}
-            <span className="text-gradient">verdade contábil</span>.
+            Seis módulos. Uma única <span className="text-gradient">verdade contábil</span>.
           </h2>
           <p className="mt-6 text-lg text-muted-foreground/80">
-            Tudo conectado ao ledger imutável. Sem planilhas paralelas, sem retrabalho,
-            sem dúvida sobre a integridade do seu dado.
+            Tudo conectado ao ledger imutável. Sem planilhas paralelas, sem retrabalho, sem dúvida
+            sobre a integridade do seu dado.
           </p>
         </div>
 
@@ -76,21 +75,23 @@ export function Modules() {
                   style={{ background: "var(--gradient-primary)" }}
                   aria-hidden
                 />
-                
+
                 <div className="relative">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary shadow-sm transition-all group-hover:bg-gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
                     <Icon className="h-6 w-6" />
                   </div>
-                  
+
                   <div className="mt-6 flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-primary/50 font-mono">0{i+1}</span>
+                    <span className="text-[10px] font-bold text-primary/50 font-mono">
+                      0{i + 1}
+                    </span>
                     <h3 className="text-xl font-bold tracking-tight">{m.title}</h3>
                   </div>
-                  
+
                   <p className="mt-4 text-sm leading-relaxed text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">
                     {m.desc}
                   </p>
-                  
+
                   <div className="mt-6 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary opacity-0 translate-x-[-10px] transition-all group-hover:opacity-100 group-hover:translate-x-0">
                     Detalhes do Módulo <ArrowRight className="h-3 w-3" />
                   </div>

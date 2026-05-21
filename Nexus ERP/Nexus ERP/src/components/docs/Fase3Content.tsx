@@ -12,17 +12,16 @@ export function Fase3Content() {
   return (
     <DocSection>
       <DocP>
-        Para começar a desenvolver agora mesmo com banco real e backend, a
-        melhor forma é usar o <strong className="text-foreground">Docker</strong>.
-        Ele permite subir um PostgreSQL profissional em segundos, sem instalar
-        nada manualmente. Aqui está o script de automação de ambiente do Nexus
-        ERP.
+        Para começar a desenvolver agora mesmo com banco real e backend, a melhor forma é usar o{" "}
+        <strong className="text-foreground">Docker</strong>. Ele permite subir um PostgreSQL
+        profissional em segundos, sem instalar nada manualmente. Aqui está o script de automação de
+        ambiente do Nexus ERP.
       </DocP>
 
       <DocH3>Passo 1: Configuração do banco (docker-compose.yml)</DocH3>
       <DocP>
-        Crie um arquivo <code className="font-mono text-primary">docker-compose.yml</code>{" "}
-        na raiz do projeto. Ele configura o PostgreSQL real.
+        Crie um arquivo <code className="font-mono text-primary">docker-compose.yml</code> na raiz
+        do projeto. Ele configura o PostgreSQL real.
       </DocP>
 
       <CodeBlock
@@ -76,10 +75,7 @@ echo Ambiente Pronto!`}
       />
 
       <DocH3>Passo 3: Backend conectado (main.py)</DocH3>
-      <DocP>
-        Este código já cria as tabelas de Compras, Vendas e RH assim que é
-        executado.
-      </DocP>
+      <DocP>Este código já cria as tabelas de Compras, Vendas e RH assim que é executado.</DocP>
 
       <CodeBlock
         language="python"
@@ -145,7 +141,10 @@ def list_products(db: Session = Depends(get_db)):
       <DocList
         ordered
         items={[
-          <>Instale o <strong className="text-foreground">Docker Desktop</strong> (se ainda não tiver).</>,
+          <>
+            Instale o <strong className="text-foreground">Docker Desktop</strong> (se ainda não
+            tiver).
+          </>,
           <>Abra o terminal na pasta onde você criou os arquivos.</>,
           <>
             Execute os comandos:
@@ -162,26 +161,24 @@ uvicorn main:app --reload   # liga o ERP`}
       <DocList
         items={[
           <>
-            <strong className="text-foreground">Persistência real:</strong> você
-            pode desligar o PC e, ao reiniciar o Docker, suas vendas e produtos
-            estarão lá.
+            <strong className="text-foreground">Persistência real:</strong> você pode desligar o PC
+            e, ao reiniciar o Docker, suas vendas e produtos estarão lá.
           </>,
           <>
             <strong className="text-foreground">Escalabilidade:</strong> esse mesmo{" "}
-            <code className="font-mono text-primary">main.py</code> pode ir para
-            AWS/Azure amanhã sem mudar quase nada.
+            <code className="font-mono text-primary">main.py</code> pode ir para AWS/Azure amanhã
+            sem mudar quase nada.
           </>,
           <>
-            <strong className="text-foreground">Ambiente isolado:</strong> o banco
-            não "suja" o seu Windows — fica dentro do container, garantindo
-            qualidade.
+            <strong className="text-foreground">Ambiente isolado:</strong> o banco não "suja" o seu
+            Windows — fica dentro do container, garantindo qualidade.
           </>,
         ]}
       />
 
       <Callout title="Próximo passo" variant="info">
-        Com o banco rodando e o backend respondendo, partimos para a Fase 4 —
-        primeira interface conectada e camada de IA para leitura de NF-e.
+        Com o banco rodando e o backend respondendo, partimos para a Fase 4 — primeira interface
+        conectada e camada de IA para leitura de NF-e.
       </Callout>
     </DocSection>
   );

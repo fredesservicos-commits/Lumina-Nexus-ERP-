@@ -50,9 +50,7 @@ export function CodeBlock({ code, language = "text", filename }: CodeBlockProps)
           <span className="inline-flex items-center rounded-md bg-primary/15 px-2 py-0.5 font-mono font-semibold text-primary">
             {language}
           </span>
-          {filename && (
-            <span className="font-mono text-muted-foreground">{filename}</span>
-          )}
+          {filename && <span className="font-mono text-muted-foreground">{filename}</span>}
         </div>
         <button
           onClick={onCopy}
@@ -82,15 +80,11 @@ export function DocSection({ children }: { children: ReactNode }) {
 }
 
 export function DocH3({ children }: { children: ReactNode }) {
-  return (
-    <h3 className="mt-8 text-xl font-bold tracking-tight text-foreground">{children}</h3>
-  );
+  return <h3 className="mt-8 text-xl font-bold tracking-tight text-foreground">{children}</h3>;
 }
 
 export function DocH4({ children }: { children: ReactNode }) {
-  return (
-    <h4 className="mt-6 text-base font-semibold text-foreground">{children}</h4>
-  );
+  return <h4 className="mt-6 text-base font-semibold text-foreground">{children}</h4>;
 }
 
 export function DocP({ children }: { children: ReactNode }) {

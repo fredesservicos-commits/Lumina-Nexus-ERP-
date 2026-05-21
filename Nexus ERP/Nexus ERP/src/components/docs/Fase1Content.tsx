@@ -12,40 +12,39 @@ export function Fase1Content() {
   return (
     <DocSection>
       <DocP>
-        A <strong className="text-foreground">Fase 1</strong> estabelece a fundação
-        do Nexus ERP: a modelagem completa do banco de dados PostgreSQL com
-        rigor contábil estilo SAP. Cada tabela aqui é a base sobre a qual todos
-        os módulos (Financeiro, Compras, Vendas, RH, Estoque) operam.
+        A <strong className="text-foreground">Fase 1</strong> estabelece a fundação do Nexus ERP: a
+        modelagem completa do banco de dados PostgreSQL com rigor contábil estilo SAP. Cada tabela
+        aqui é a base sobre a qual todos os módulos (Financeiro, Compras, Vendas, RH, Estoque)
+        operam.
       </DocP>
 
       <DocH3>1. Princípios da modelagem</DocH3>
       <DocList
         items={[
           <>
-            <strong className="text-foreground">Multi-empresa nativo:</strong>{" "}
-            toda tabela transacional carrega <code className="font-mono text-primary">company_id</code>{" "}
-            e é protegida por Row-Level Security.
+            <strong className="text-foreground">Multi-empresa nativo:</strong> toda tabela
+            transacional carrega <code className="font-mono text-primary">company_id</code> e é
+            protegida por Row-Level Security.
           </>,
           <>
-            <strong className="text-foreground">Partidas dobradas:</strong> o ledger
-            contábil só aceita lançamentos cuja soma de débitos é igual à soma de
-            créditos.
+            <strong className="text-foreground">Partidas dobradas:</strong> o ledger contábil só
+            aceita lançamentos cuja soma de débitos é igual à soma de créditos.
           </>,
           <>
-            <strong className="text-foreground">Imutabilidade:</strong> registros do
-            ledger nunca são alterados — correções viram novos lançamentos de estorno.
+            <strong className="text-foreground">Imutabilidade:</strong> registros do ledger nunca
+            são alterados — correções viram novos lançamentos de estorno.
           </>,
           <>
-            <strong className="text-foreground">UUIDs como chave primária:</strong>{" "}
-            evita colisões entre empresas e facilita sincronização.
+            <strong className="text-foreground">UUIDs como chave primária:</strong> evita colisões
+            entre empresas e facilita sincronização.
           </>,
         ]}
       />
 
       <DocH3>2. Núcleo: empresa, parceiros e plano de contas</DocH3>
       <DocP>
-        As três tabelas fundamentais que sustentam toda a operação. Sem elas,
-        nada do restante existe.
+        As três tabelas fundamentais que sustentam toda a operação. Sem elas, nada do restante
+        existe.
       </DocP>
 
       <CodeBlock
@@ -88,8 +87,8 @@ CREATE TABLE chart_of_accounts (
 
       <DocH3>3. Ledger: o coração contábil</DocH3>
       <DocP>
-        O ledger é o registro único da verdade. Cada lançamento tem dois lados
-        (débito/crédito) e a soma deve sempre fechar em zero.
+        O ledger é o registro único da verdade. Cada lançamento tem dois lados (débito/crédito) e a
+        soma deve sempre fechar em zero.
       </DocP>
 
       <CodeBlock
@@ -165,8 +164,8 @@ CREATE TABLE employees (
 
       <DocH3>5. Segurança: roles e RLS</DocH3>
       <DocP>
-        Roles ficam em tabela separada — nunca em colunas booleanas no perfil
-        do usuário — para evitar escalonamento de privilégios.
+        Roles ficam em tabela separada — nunca em colunas booleanas no perfil do usuário — para
+        evitar escalonamento de privilégios.
       </DocP>
 
       <CodeBlock
@@ -201,8 +200,8 @@ CREATE POLICY "company_isolation" ON journal_entries
       />
 
       <Callout title="Resultado da Fase 1" variant="success">
-        Banco modelado, isolado por empresa, com integridade contábil garantida
-        no nível do banco de dados. Pronto para receber o backend (Fase 2).
+        Banco modelado, isolado por empresa, com integridade contábil garantida no nível do banco de
+        dados. Pronto para receber o backend (Fase 2).
       </Callout>
     </DocSection>
   );

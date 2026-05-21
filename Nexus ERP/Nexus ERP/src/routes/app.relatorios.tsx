@@ -15,26 +15,35 @@ function RelatoriosPage() {
   const { list: listSales } = useSales();
   const { list: listPurchases } = usePurchases();
   const [data, setData] = useState<{ name: string; valor: number }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([summary(), listSales(), listPurchases()])
-      .then(([sum, sales, purchases]) => {
+      .then(([sum]) => {
         setData([
           { name: "Vendas", valor: sum.total_sales },
           { name: "Compras", valor: sum.total_purchases },
           { name: "Lucro", valor: sum.net_profit },
         ]);
       })
-      .catch(console.error);
-  }, []);
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [summary, listSales, listPurchases]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center p-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Relatórios</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Análise financeira do período
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Análise financeira do período</p>
       </div>
 
       <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-sm">

@@ -158,56 +158,52 @@ export function Fase6Content() {
     <DocSection>
       <DocP>
         Esta é a fase em que o Nexus deixa de ser um cadastro e vira uma{" "}
-        <strong>Torre de Controle</strong>. Unimos três peças que, juntas,
-        entregam a primeira versão funcional do ERP: <strong>Busca de
-        Vendas</strong>, <strong>Módulo de Compras</strong> e{" "}
-        <strong>Dashboard de Rentabilidade</strong> — tudo calculado em tempo
-        real direto do PostgreSQL.
+        <strong>Torre de Controle</strong>. Unimos três peças que, juntas, entregam a primeira
+        versão funcional do ERP: <strong>Busca de Vendas</strong>,{" "}
+        <strong>Módulo de Compras</strong> e <strong>Dashboard de Rentabilidade</strong> — tudo
+        calculado em tempo real direto do PostgreSQL.
       </DocP>
 
       <Callout title="O salto desta fase" variant="success">
         O sistema passa a responder à pergunta que importa para o dono:{" "}
         <em>"Estou ganhando ou perdendo dinheiro agora?"</em>. A conta{" "}
-        <strong>Receita − Despesa = Lucro</strong> deixa de ser planilha e vira
-        endpoint.
+        <strong>Receita − Despesa = Lucro</strong> deixa de ser planilha e vira endpoint.
       </Callout>
 
       <DocH3>1. Backend — novos modelos e endpoints (`main.py`)</DocH3>
       <DocP>
-        Adicionamos a tabela <code>purchases</code> e três novos endpoints:
-        busca por cliente, registro de compras e o resumo financeiro
-        consolidado.
+        Adicionamos a tabela <code>purchases</code> e três novos endpoints: busca por cliente,
+        registro de compras e o resumo financeiro consolidado.
       </DocP>
       <CodeBlock code={backendCode} language="python" filename="main.py" />
 
       <DocList
         items={[
           <>
-            <strong>/sales/search</strong> — usa <code>ilike</code> para busca
-            case-insensitive por cliente.
+            <strong>/sales/search</strong> — usa <code>ilike</code> para busca case-insensitive por
+            cliente.
           </>,
           <>
-            <strong>/purchases/new</strong> — espelha a estrutura de vendas,
-            mas representa <em>saída</em> de caixa.
+            <strong>/purchases/new</strong> — espelha a estrutura de vendas, mas representa{" "}
+            <em>saída</em> de caixa.
           </>,
           <>
-            <strong>/dashboard/summary</strong> — agrega <code>SUM(total)</code>{" "}
-            das duas tabelas e devolve o lucro em uma única chamada.
+            <strong>/dashboard/summary</strong> — agrega <code>SUM(total)</code> das duas tabelas e
+            devolve o lucro em uma única chamada.
           </>,
         ]}
       />
 
       <Callout title="Por que SUM no banco e não no frontend?" variant="info">
-        Agregar no PostgreSQL é ordens de magnitude mais rápido do que trafegar
-        milhares de linhas até o browser para somar lá. É a mesma filosofia que
-        SAP/Oracle aplicam: <strong>cálculo perto do dado</strong>.
+        Agregar no PostgreSQL é ordens de magnitude mais rápido do que trafegar milhares de linhas
+        até o browser para somar lá. É a mesma filosofia que SAP/Oracle aplicam:{" "}
+        <strong>cálculo perto do dado</strong>.
       </Callout>
 
       <DocH3>2. Frontend — Dashboard, Busca e Formulários (`index.html`)</DocH3>
       <DocP>
-        O layout ganha três blocos: cards de KPI no topo, barra de busca
-        reativa e dois formulários lado a lado (Vendas e Compras). A tabela
-        agora é alimentada pelo endpoint de busca.
+        O layout ganha três blocos: cards de KPI no topo, barra de busca reativa e dois formulários
+        lado a lado (Vendas e Compras). A tabela agora é alimentada pelo endpoint de busca.
       </DocP>
       <CodeBlock code={frontendCode} language="html" filename="index.html" />
 
@@ -216,21 +212,17 @@ export function Fase6Content() {
         ordered
         items={[
           <>
-            Usuário clica <strong>Salvar Venda</strong> → POST{" "}
-            <code>/sales/new</code>.
+            Usuário clica <strong>Salvar Venda</strong> → POST <code>/sales/new</code>.
           </>,
           <>
-            Frontend dispara <code>atualizarDash()</code> → GET{" "}
-            <code>/dashboard/summary</code> → KPIs recalculam.
+            Frontend dispara <code>atualizarDash()</code> → GET <code>/dashboard/summary</code> →
+            KPIs recalculam.
           </>,
           <>
-            Frontend dispara <code>buscarVendas()</code> → GET{" "}
-            <code>/sales/search</code> → tabela é redesenhada.
+            Frontend dispara <code>buscarVendas()</code> → GET <code>/sales/search</code> → tabela é
+            redesenhada.
           </>,
-          <>
-            Tudo isso sem reload — a página vive em estado contínuo com o
-            banco.
-          </>,
+          <>Tudo isso sem reload — a página vive em estado contínuo com o banco.</>,
         ]}
       />
 
@@ -239,25 +231,21 @@ export function Fase6Content() {
         ordered
         items={[
           <>
-            Registre uma <strong>Venda de R$ 1.000</strong> → o card{" "}
-            <em>Lucro Real</em> sobe para R$ 1.000.
+            Registre uma <strong>Venda de R$ 1.000</strong> → o card <em>Lucro Real</em> sobe para
+            R$ 1.000.
           </>,
           <>
-            Registre uma <strong>Compra de R$ 400</strong> → o lucro cai para{" "}
-            R$ 600 instantaneamente.
+            Registre uma <strong>Compra de R$ 400</strong> → o lucro cai para R$ 600
+            instantaneamente.
           </>,
-          <>
-            Digite parte do nome do cliente na busca → a tabela filtra em
-            tempo real, sem F5.
-          </>,
+          <>Digite parte do nome do cliente na busca → a tabela filtra em tempo real, sem F5.</>,
         ]}
       />
 
       <Callout title="O que você acabou de construir" variant="success">
-        Um protótipo funcional de ERP com <strong>dois departamentos
-        conversando</strong> (Vendas e Compras), persistência relacional e
-        leitura financeira consolidada. É o esqueleto sobre o qual entram, nas
-        próximas fases, autenticação, multi-empresa e IA.
+        Um protótipo funcional de ERP com <strong>dois departamentos conversando</strong> (Vendas e
+        Compras), persistência relacional e leitura financeira consolidada. É o esqueleto sobre o
+        qual entram, nas próximas fases, autenticação, multi-empresa e IA.
       </Callout>
     </DocSection>
   );

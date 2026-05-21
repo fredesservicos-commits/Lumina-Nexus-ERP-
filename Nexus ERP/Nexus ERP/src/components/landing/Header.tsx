@@ -39,8 +39,12 @@ export function Header() {
             <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-black leading-none tracking-tighter uppercase italic">Nexus ERP</span>
-            <span className="text-[9px] font-bold tracking-[0.2em] text-primary uppercase opacity-80">Lumina Enterprise</span>
+            <span className="text-lg font-black leading-none tracking-tighter uppercase italic">
+              Nexus ERP
+            </span>
+            <span className="text-[9px] font-bold tracking-[0.2em] text-primary uppercase opacity-80">
+              Lumina Enterprise
+            </span>
           </div>
         </a>
 
@@ -64,7 +68,13 @@ export function Header() {
           </Link>
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-3 md:flex">
+          <Link
+            to="/login"
+            className="text-[13px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:text-primary"
+          >
+            Entrar
+          </Link>
           <Button
             asChild
             className="h-10 rounded-xl bg-gradient-primary px-6 text-xs font-bold uppercase tracking-widest text-primary-foreground shadow-glow transition-all hover:scale-105 hover:brightness-110 active:scale-95"
@@ -102,6 +112,13 @@ export function Header() {
             >
               <BookOpen className="h-5 w-5" />
               Documentação
+            </Link>
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 text-lg font-bold tracking-tight text-muted-foreground transition-colors hover:text-primary"
+            >
+              Entrar
             </Link>
             <Button
               asChild

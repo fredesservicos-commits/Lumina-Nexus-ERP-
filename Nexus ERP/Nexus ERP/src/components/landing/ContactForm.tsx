@@ -44,8 +44,8 @@ export function ContactForm() {
               Veja o Nexus <span className="text-gradient">funcionando</span> com seus dados
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Agende uma conversa de 30 minutos com um especialista. Mostramos o
-              dashboard, os módulos e como migrar do seu sistema atual.
+              Agende uma conversa de 30 minutos com um especialista. Mostramos o dashboard, os
+              módulos e como migrar do seu sistema atual.
             </p>
 
             <ul className="mt-6 space-y-3">
@@ -89,11 +89,7 @@ export function ContactForm() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="telefone">Telefone</Label>
-                <Input
-                  id="telefone"
-                  name="telefone"
-                  placeholder="(11) 99999-0000"
-                />
+                <Input id="telefone" name="telefone" placeholder="(11) 99999-0000" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="mensagem">Mensagem</Label>

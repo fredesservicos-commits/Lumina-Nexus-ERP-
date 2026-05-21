@@ -42,9 +42,7 @@ export function Phases() {
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Como funciona — <span className="text-gradient">As 4 Fases</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Construção sólida, em camadas, sem atalhos.
-          </p>
+          <p className="mt-4 text-muted-foreground">Construção sólida, em camadas, sem atalhos.</p>
         </div>
 
         <ol className="relative mt-14 space-y-8 before:absolute before:left-6 before:top-2 before:bottom-2 before:w-px before:bg-gradient-to-b before:from-primary/60 before:via-accent/40 before:to-transparent sm:before:left-8">
@@ -57,15 +55,11 @@ export function Phases() {
                 </div>
                 <div className="rounded-2xl border border-border bg-card/60 p-5 backdrop-blur sm:p-6">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-xs font-mono font-semibold text-accent">
-                      FASE {p.n}
-                    </span>
+                    <span className="text-xs font-mono font-semibold text-accent">FASE {p.n}</span>
                     <h3 className="text-lg font-semibold sm:text-xl">{p.title}</h3>
                     <span className="text-sm text-muted-foreground">— {p.subtitle}</span>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {p.desc}
-                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
                 </div>
               </li>
             );
