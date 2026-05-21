@@ -1,10 +1,6 @@
 import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sparkles, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/cadastro")({
   component: CadastroPage,
@@ -12,17 +8,17 @@ export const Route = createFileRoute("/cadastro")({
 
 function CadastroPage() {
   const { register } = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
+    setSuccess(false);
     if (password !== confirm) {
       setError("As senhas não conferem");
       return;
@@ -31,13 +27,14 @@ function CadastroPage() {
       setError("A senha deve ter pelo menos 6 caracteres");
       return;
     }
-
     setLoading(true);
     try {
-      await register(email, password);
-      navigate({ to: "/app" });
+      const result = await register(email, password);
+      console.log("Registro OK:", result);
+      setSuccess(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erro ao cadastrar");
+    } finally {
       setLoading(false);
     }
   };
@@ -46,58 +43,59 @@ function CadastroPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
-            <Sparkles className="h-6 w-6 text-primary-foreground" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+            <span className="text-2xl text-primary-foreground">+</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Criar Conta</h1>
           <p className="mt-1 text-sm text-muted-foreground">Cadastre-se no Nexus ERP</p>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+            <input
               id="email"
               type="email"
               placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm"
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium mb-1">Senha</label>
+            <input
               id="password"
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm"
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirm">Confirmar Senha</Label>
-            <Input
+          <div>
+            <label htmlFor="confirm" className="block text-sm font-medium mb-1">Confirmar Senha</label>
+            <input
               id="confirm"
               type="password"
               placeholder="••••••••"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm"
             />
           </div>
-
-          {error && <p className="text-sm text-destructive">{error}</p>}
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {error && <p className="text-sm text-red-500">{error}</p>}
+          {success && <p className="text-sm text-green-500">Conta criada com sucesso!</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+          >
             {loading ? "Cadastrando..." : "Criar Conta"}
-          </Button>
+          </button>
         </form>
-
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem conta?{" "}
           <Link to="/login" className="font-medium text-primary hover:underline">

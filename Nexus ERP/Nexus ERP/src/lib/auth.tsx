@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
 
 export interface AuthUser {
   email: string;
@@ -48,28 +48,30 @@ async function apiCall(url: string, body: object) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => loadUser());
 
-  const login = async (email: string, password: string): Promise<AuthUser> => {
+  const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
     const data = await apiCall(`${API}/auth/login`, { email, password });
     localStorage.setItem("nexus_erp_auth", JSON.stringify(data));
     setUser(data);
     return data;
-  };
+  }, []);
 
-  const register = async (email: string, password: string): Promise<AuthUser> => {
+  const register = useCallback(async (email: string, password: string): Promise<AuthUser> => {
     const data = await apiCall(`${API}/auth/register`, { email, password });
     localStorage.setItem("nexus_erp_auth", JSON.stringify(data));
     setUser(data);
     return data;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("nexus_erp_auth");
     setUser(null);
     window.location.href = "/";
-  };
+  }, []);
+
+  const value = useMemo(() => ({ user, login, register, logout }), [user, login, register, logout]);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -7,6 +7,7 @@ const firebaseConfig = {
   storageBucket: "lumina-nexus-erp.firebasestorage.app",
   messagingSenderId: "703891004008",
   appId: "1:703891004008:web:d29367043438fec6aab9dd",
+  measurementId: "G-E43HQN5ENL",
 };
 
 export const app = initializeApp(firebaseConfig);

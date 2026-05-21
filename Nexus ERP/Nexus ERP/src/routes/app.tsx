@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { Loader2 } from "lucide-react";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -43,7 +44,13 @@ function AppLayout() {
     logout();
   };
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
