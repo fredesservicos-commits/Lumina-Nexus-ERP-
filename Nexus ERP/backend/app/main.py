@@ -18,15 +18,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+db_connected = False
+
 
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
+    global db_connected
+    try:
+        Base.metadata.create_all(bind=engine)
+        db_connected = True
+    except Exception as e:
+        print(f"Database connection failed: {e}")
+        db_connected = False
 
 
 @app.get("/")
 def root():
-    return {"status": "Nexus ERP Online", "database": "Connected"}
+    return {
+        "status": "Nexus ERP Online",
+        "database": "Connected" if db_connected else "Disconnected",
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 register_routers(app)
