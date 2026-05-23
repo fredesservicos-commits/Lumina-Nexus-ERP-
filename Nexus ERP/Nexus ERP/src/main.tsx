@@ -22,9 +22,12 @@ if ('serviceWorker' in navigator) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 30,
+      staleTime: 1000 * 60 * 2,
+      gcTime: 1000 * 60 * 5,
       retry: 1,
-      refetchOnWindowFocus: true,
+      retryDelay: 1000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
     },
   },
 });

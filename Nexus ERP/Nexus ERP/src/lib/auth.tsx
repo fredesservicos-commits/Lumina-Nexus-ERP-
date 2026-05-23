@@ -46,15 +46,16 @@ function persistUser(user: AuthUser | null) {
   }
 }
 
-function buildAuthUser(fbUser: import("firebase/auth").User, role?: string): Promise<AuthUser> {
-  return fbUser.getIdToken().then((token) => ({
+async function buildAuthUser(fbUser: import("firebase/auth").User, role?: string): Promise<AuthUser> {
+  const token = await fbUser.getIdToken();
+  return {
     email: fbUser.email || "",
     localId: fbUser.uid,
     idToken: token,
     refreshToken: fbUser.refreshToken || "",
     displayName: fbUser.displayName,
     role: role || null,
-  }));
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -62,22 +63,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const unsub = onAuthChange((fbUser) => {
-      if (fbUser) {
-        buildAuthUser(fbUser, loadUser()?.role || undefined).then((authUser) => {
+    const timeout = setTimeout(() => {
+      if (!ready) {
+        setReady(true);
+      }
+    }, 3000);
+
+    const unsub = onAuthChange(async (fbUser) => {
+      clearTimeout(timeout);
+      try {
+        if (fbUser) {
+          const authUser = await buildAuthUser(fbUser, loadUser()?.role || undefined);
           persistUser(authUser);
           setUser(authUser);
-        }).catch(() => {
+        } else {
           persistUser(null);
           setUser(null);
-        });
-      } else {
+        }
+      } catch {
         persistUser(null);
         setUser(null);
       }
       setReady(true);
     });
-    return unsub;
+    return () => {
+      clearTimeout(timeout);
+      unsub();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
@@ -128,7 +140,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user, login, register, logout, isAdmin, isGerente],
   );
 
-  if (!ready) return null;
+  if (!ready) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+      </div>
+    );
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

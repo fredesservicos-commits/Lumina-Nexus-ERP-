@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
@@ -33,9 +33,11 @@ function AppLayout() {
   const { pathname } = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const redirected = useRef(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !redirected.current) {
+      redirected.current = true;
       navigate({ to: "/login" });
     }
   }, [user, navigate]);

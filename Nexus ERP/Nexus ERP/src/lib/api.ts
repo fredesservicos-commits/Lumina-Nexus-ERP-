@@ -1,15 +1,30 @@
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+const TOKEN_CACHE: { token: string; expiry: number } = { token: "", expiry: 0 };
+
 async function getToken(): Promise<string | null> {
+  if (TOKEN_CACHE.token && Date.now() < TOKEN_CACHE.expiry) {
+    return TOKEN_CACHE.token;
+  }
   try {
     const { auth } = await import("@/lib/firebase/auth");
     const fbUser = auth.currentUser;
-    if (fbUser) return await fbUser.getIdToken();
+    if (fbUser) {
+      const token = await fbUser.getIdToken();
+      TOKEN_CACHE.token = token;
+      TOKEN_CACHE.expiry = Date.now() + 300000;
+      return token;
+    }
   } catch {}
   try {
     const raw = localStorage.getItem("nexus_erp_auth");
     if (!raw) return null;
-    return JSON.parse(raw).idToken || null;
+    const token = JSON.parse(raw).idToken || null;
+    if (token) {
+      TOKEN_CACHE.token = token;
+      TOKEN_CACHE.expiry = Date.now() + 300000;
+    }
+    return token;
   } catch {
     return null;
   }
@@ -30,7 +45,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
+  const timer = setTimeout(() => controller.abort(), 8000);
   try {
     const res = await fetch(url, { headers, signal: controller.signal, ...options });
     if (res.status === 204) return undefined as T;
