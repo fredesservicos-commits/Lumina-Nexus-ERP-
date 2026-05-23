@@ -1,50 +1,54 @@
-const CACHE_NAME = 'lumina-nexus-erp-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+const CACHE_NAME = "lumina-nexus-erp-v1";
+const STATIC_CACHE = "lumina-nexus-erp-static-v1";
 
-// Install the service worker
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(STATIC_CACHE).then((cache) =>
+      cache.addAll(["/", "/index.html", "/manifest.json", "/icon.svg"]),
+    ),
   );
 });
 
-// Cache and return requests
-self.addEventListener('fetch', (event) => {
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k !== STATIC_CACHE && k !== CACHE_NAME)
+          .map((k) => caches.delete(k)),
+      ),
+    ),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(() => caches.match("/index.html")),
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/assets/")) {
+    event.respondWith(
+      caches.match(request).then((cached) => cached || fetch(request).then((res) => {
+        const clone = res.clone();
+        caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
+        return res;
+      })),
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/api/")) return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
-// Update a service worker
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.match(request).then((cached) => cached || fetch(request)),
   );
 });
