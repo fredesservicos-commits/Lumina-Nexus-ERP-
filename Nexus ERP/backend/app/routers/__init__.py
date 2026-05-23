@@ -1,4 +1,4 @@
-from app.routers import sales, purchases, dashboard, employees, finance, auth
+from app.routers import sales, purchases, dashboard, employees, finance, auth, payroll
 
 
 def register_routers(app):
@@ -8,3 +8,4 @@ def register_routers(app):
     app.include_router(employees.router, prefix="/employees", tags=["RH"])
     app.include_router(finance.router, prefix="/finance", tags=["Financeiro"])
     app.include_router(auth.router, prefix="/auth", tags=["Autenticação"])
+    app.include_router(payroll.router, prefix="/payroll", tags=["Folha de Pagamento"])

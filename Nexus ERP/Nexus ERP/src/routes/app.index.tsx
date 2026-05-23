@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   TrendingUp,
@@ -9,17 +8,7 @@ import {
   Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/api";
-import { useDashboard } from "@/hooks/useDashboard";
-import type { DashboardSummary } from "@/lib/types";
-
-interface RecentItem {
-  id: string;
-  type: string;
-  description: string;
-  total: number;
-  created_at: string;
-}
+import { useDashboardSummary, useRecentTransactions } from "@/hooks/useDashboard";
 
 const typeLabel: Record<string, string> = {
   SALES_ORDER: "Venda",
@@ -31,20 +20,8 @@ export const Route = createFileRoute("/app/")({
 });
 
 function DashboardPage() {
-  const { summary } = useDashboard();
-  const [data, setData] = useState<DashboardSummary | null>(null);
-  const [recent, setRecent] = useState<RecentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([summary(), api.get<RecentItem[]>("/dashboard/recent?limit=10")])
-      .then(([sum, recents]) => {
-        setData(sum);
-        setRecent(recents);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [summary]);
+  const { data, isLoading } = useDashboardSummary();
+  const { data: recent } = useRecentTransactions();
 
   const cards = [
     {
@@ -78,7 +55,7 @@ function DashboardPage() {
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center p-8">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
@@ -142,7 +119,7 @@ function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {recent.map((item) => (
+              {recent?.map((item) => (
                 <tr key={item.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4">
                     <span
@@ -163,17 +140,16 @@ function DashboardPage() {
                   </td>
                   <td className="px-6 py-4 text-sm">{item.description}</td>
                   <td className="px-6 py-4 text-sm font-medium">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(item.total)}
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+                      item.total,
+                    )}
                   </td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">
                     {new Date(item.created_at).toLocaleDateString("pt-BR")}
                   </td>
                 </tr>
               ))}
-              {recent.length === 0 && (
+              {(!recent || recent.length === 0) && (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Nenhuma transação recente

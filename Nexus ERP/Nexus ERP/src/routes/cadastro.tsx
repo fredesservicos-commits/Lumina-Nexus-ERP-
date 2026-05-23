@@ -51,7 +51,9 @@ function CadastroPage() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">E-mail</label>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
+              E-mail
+            </label>
             <input
               id="email"
               type="email"
@@ -63,7 +65,9 @@ function CadastroPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">Senha</label>
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
+              Senha
+            </label>
             <input
               id="password"
               type="password"
@@ -75,7 +79,9 @@ function CadastroPage() {
             />
           </div>
           <div>
-            <label htmlFor="confirm" className="block text-sm font-medium mb-1">Confirmar Senha</label>
+            <label htmlFor="confirm" className="block text-sm font-medium mb-1">
+              Confirmar Senha
+            </label>
             <input
               id="confirm"
               type="password"

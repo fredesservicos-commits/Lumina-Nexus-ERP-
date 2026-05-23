@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BookOpen, Plus, Trash2, AlertCircle, Pencil } from "lucide-react";
 import { api } from "@/lib/api";
-import { BookOpen, Plus, Trash2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,17 +47,58 @@ export const Route = createFileRoute("/app/financeiro")({
   component: FinanceiroPage,
 });
 
+const typeLabel: Record<string, string> = {
+  ASSET: "Ativo",
+  LIABILITY: "Passivo",
+  EQUITY: "Patrimônio Líquido",
+  REVENUE: "Receita",
+  EXPENSE: "Despesa",
+};
+
+const accountTypes = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
+
 function FinanceiroPage() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [entries, setEntries] = useState<LedgerEntry[]>([]);
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const qc = useQueryClient();
   const [tab, setTab] = useState<"visao" | "contas" | "lancamentos">("visao");
+
+  const { data: accounts } = useQuery<Account[]>({
+    queryKey: ["finance", "accounts"],
+    queryFn: () => api.get<Account[]>("/finance/accounts"),
+  });
+
+  const { data: entries } = useQuery<LedgerEntry[]>({
+    queryKey: ["finance", "ledger"],
+    queryFn: () => api.get<LedgerEntry[]>("/finance/ledger"),
+  });
+
+  const { data: summary } = useQuery<Summary>({
+    queryKey: ["finance", "summary"],
+    queryFn: () => api.get<Summary>("/finance/summary"),
+  });
+
+  const createAccount = useMutation({
+    mutationFn: (data: { code: string; name: string; account_type: string }) =>
+      api.post("/finance/accounts", data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "accounts"] }),
+  });
+
+  const deleteAccount = useMutation({
+    mutationFn: (id: number) => api.del(`/finance/accounts/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["finance", "accounts"] }),
+  });
+
+  const createEntry = useMutation({
+    mutationFn: (data: unknown) => api.post("/finance/ledger", data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["finance", "ledger"] });
+      qc.invalidateQueries({ queryKey: ["finance", "summary"] });
+    },
+  });
 
   const [code, setCode] = useState("");
   const [accName, setAccName] = useState("");
   const [accType, setAccType] = useState("");
 
-  // Estados para o formulário de Novo Lançamento
   const [showEntryForm, setShowEntryForm] = useState(false);
   const [entryDescription, setEntryDescription] = useState("");
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split("T")[0]);
@@ -67,36 +109,12 @@ function FinanceiroPage() {
     { accountId: "", debit: "0", credit: "0" },
   ]);
 
-  const loadData = async () => {
-    try {
-      const [a, e, s] = await Promise.all([
-        api.get<Account[]>("/finance/accounts"),
-        api.get<LedgerEntry[]>("/finance/ledger"),
-        api.get<Summary>("/finance/summary"),
-      ]);
-      setAccounts(a);
-      setEntries(e);
-      setSummary(s);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const handleCreateAccount = async () => {
     if (!code || !accName || !accType) return;
-    try {
-      await api.post("/finance/accounts", { code, name: accName, account_type: accType });
-      setCode("");
-      setAccName("");
-      setAccType("");
-      loadData();
-    } catch (err) {
-      console.error(err);
-    }
+    await createAccount.mutateAsync({ code, name: accName, account_type: accType });
+    setCode("");
+    setAccName("");
+    setAccType("");
   };
 
   const handleItemChange = (
@@ -148,40 +166,23 @@ function FinanceiroPage() {
 
   const handleCreateEntry = async () => {
     if (!isFormValid) return;
-    try {
-      const payload = {
-        description: entryDescription,
-        transaction_date: new Date(entryDate).toISOString(),
-        items: entryItems.map((item) => ({
-          account_id: parseInt(item.accountId),
-          debit: parseFloat(item.debit) || 0,
-          credit: parseFloat(item.credit) || 0,
-        })),
-      };
-      await api.post("/finance/ledger", payload);
-
-      setEntryDescription("");
-      setEntryDate(new Date().toISOString().split("T")[0]);
-      setEntryItems([
-        { accountId: "", debit: "0", credit: "0" },
-        { accountId: "", debit: "0", credit: "0" },
-      ]);
-      setShowEntryForm(false);
-      loadData();
-    } catch (err) {
-      console.error(err);
-    }
+    await createEntry.mutateAsync({
+      description: entryDescription,
+      transaction_date: new Date(entryDate).toISOString(),
+      items: entryItems.map((item) => ({
+        account_id: parseInt(item.accountId),
+        debit: parseFloat(item.debit) || 0,
+        credit: parseFloat(item.credit) || 0,
+      })),
+    });
+    setEntryDescription("");
+    setEntryDate(new Date().toISOString().split("T")[0]);
+    setEntryItems([
+      { accountId: "", debit: "0", credit: "0" },
+      { accountId: "", debit: "0", credit: "0" },
+    ]);
+    setShowEntryForm(false);
   };
-
-  const typeLabel: Record<string, string> = {
-    ASSET: "Ativo",
-    LIABILITY: "Passivo",
-    EQUITY: "Patrimônio Líquido",
-    REVENUE: "Receita",
-    EXPENSE: "Despesa",
-  };
-
-  const accountTypes = ["ASSET", "LIABILITY", "EQUITY", "REVENUE", "EXPENSE"];
 
   return (
     <div className="p-8">
@@ -278,7 +279,7 @@ function FinanceiroPage() {
                 </Select>
               </div>
               <div className="flex items-end">
-                <Button onClick={handleCreateAccount}>
+                <Button onClick={handleCreateAccount} disabled={createAccount.isPending}>
                   <Plus className="mr-2 h-4 w-4" />
                   Criar
                 </Button>
@@ -299,22 +300,35 @@ function FinanceiroPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Tipo
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {accounts.map((acc) => (
+                {accounts?.map((acc) => (
                   <tr key={acc.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 text-sm font-mono">{acc.code}</td>
                     <td className="px-6 py-4 text-sm">{acc.name}</td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {typeLabel[acc.account_type] ?? acc.account_type}
                     </td>
+                    <td className="px-6 py-4">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-rose-400 hover:text-rose-300"
+                        onClick={() => deleteAccount.mutate(acc.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
                   </tr>
                 ))}
-                {accounts.length === 0 && (
+                {(!accounts || accounts.length === 0) && (
                   <tr>
                     <td
-                      colSpan={3}
+                      colSpan={4}
                       className="px-6 py-12 text-center text-sm text-muted-foreground"
                     >
                       Nenhuma conta cadastrada
@@ -379,7 +393,7 @@ function FinanceiroPage() {
                           <SelectValue placeholder="Selecione a conta" />
                         </SelectTrigger>
                         <SelectContent>
-                          {accounts.map((acc) => (
+                          {accounts?.map((acc) => (
                             <SelectItem key={acc.id} value={acc.id.toString()}>
                               {acc.code} - {acc.name} (
                               {typeLabel[acc.account_type] || acc.account_type})
@@ -424,7 +438,6 @@ function FinanceiroPage() {
                 </Button>
               </div>
 
-              {/* Status e Totais */}
               <div className="flex flex-wrap justify-between items-center bg-white/[0.02] p-4 rounded-xl border border-white/5 gap-4">
                 <div className="flex gap-6 text-sm">
                   <div>
@@ -464,7 +477,10 @@ function FinanceiroPage() {
                     </div>
                   )}
 
-                  <Button onClick={handleCreateEntry} disabled={!isFormValid}>
+                  <Button
+                    onClick={handleCreateEntry}
+                    disabled={!isFormValid || createEntry.isPending}
+                  >
                     Salvar Lançamento
                   </Button>
                 </div>
@@ -491,7 +507,7 @@ function FinanceiroPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {entries.map((entry) => {
+                {entries?.map((entry) => {
                   const totalDebit = entry.items.reduce((s, i) => s + i.debit, 0);
                   const totalCredit = entry.items.reduce((s, i) => s + i.credit, 0);
                   return (
@@ -519,7 +535,7 @@ function FinanceiroPage() {
                     </tr>
                   );
                 })}
-                {entries.length === 0 && (
+                {(!entries || entries.length === 0) && (
                   <tr>
                     <td
                       colSpan={4}

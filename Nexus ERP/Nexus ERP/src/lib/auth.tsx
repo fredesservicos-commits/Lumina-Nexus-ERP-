@@ -1,17 +1,30 @@
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from "react";
+import {
+  auth,
+  login as fbLogin,
+  register as fbRegister,
+  logout as fbLogout,
+  onAuthChange,
+} from "@/lib/firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/firestore";
 
 export interface AuthUser {
   email: string;
   localId: string;
   idToken: string;
   refreshToken: string;
+  displayName?: string | null;
+  role?: string | null;
 }
 
 interface AuthContextType {
   user: AuthUser | null;
   login: (email: string, password: string) => Promise<AuthUser>;
-  register: (email: string, password: string) => Promise<AuthUser>;
+  register: (email: string, password: string, displayName?: string) => Promise<AuthUser>;
   logout: () => void;
+  isAdmin: boolean;
+  isGerente: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,56 +38,99 @@ function loadUser(): AuthUser | null {
   }
 }
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
-async function apiCall(url: string, body: object) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10000);
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Erro na requisição");
-    return data;
-  } finally {
-    clearTimeout(timer);
+function persistUser(user: AuthUser | null) {
+  if (user) {
+    localStorage.setItem("nexus_erp_auth", JSON.stringify(user));
+  } else {
+    localStorage.removeItem("nexus_erp_auth");
   }
+}
+
+function buildAuthUser(fbUser: import("firebase/auth").User, role?: string): Promise<AuthUser> {
+  return fbUser.getIdToken().then((token) => ({
+    email: fbUser.email || "",
+    localId: fbUser.uid,
+    idToken: token,
+    refreshToken: fbUser.refreshToken || "",
+    displayName: fbUser.displayName,
+    role: role || null,
+  }));
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => loadUser());
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const unsub = onAuthChange((fbUser) => {
+      if (fbUser) {
+        buildAuthUser(fbUser, loadUser()?.role || undefined).then((authUser) => {
+          persistUser(authUser);
+          setUser(authUser);
+        }).catch(() => {
+          persistUser(null);
+          setUser(null);
+        });
+      } else {
+        persistUser(null);
+        setUser(null);
+      }
+      setReady(true);
+    });
+    return unsub;
+  }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
-    const data = await apiCall(`${API}/auth/login`, { email, password });
-    localStorage.setItem("nexus_erp_auth", JSON.stringify(data));
-    setUser(data);
-    return data;
+    const credential = await fbLogin(email, password);
+    const fbUser = credential.user;
+    let role = "operador";
+    try {
+      const snap = await getDoc(doc(db, "users", fbUser.uid));
+      if (snap.exists()) role = snap.data().role || "operador";
+    } catch {}
+    const authUser = await buildAuthUser(fbUser, role);
+    persistUser(authUser);
+    setUser(authUser);
+    return authUser;
   }, []);
 
-  const register = useCallback(async (email: string, password: string): Promise<AuthUser> => {
-    const data = await apiCall(`${API}/auth/register`, { email, password });
-    localStorage.setItem("nexus_erp_auth", JSON.stringify(data));
-    setUser(data);
-    return data;
-  }, []);
+  const register = useCallback(
+    async (email: string, password: string, displayName?: string): Promise<AuthUser> => {
+      const credential = await fbRegister(email, password);
+      const fbUser = credential.user;
+      const display = displayName || fbUser.email?.split("@")[0] || "";
+      await setDoc(doc(db, "users", fbUser.uid), {
+        email: fbUser.email,
+        displayName: display,
+        role: "operador",
+        createdAt: new Date().toISOString(),
+      }).catch(() => {});
+      const authUser = await buildAuthUser(fbUser, "operador");
+      persistUser(authUser);
+      setUser(authUser);
+      return authUser;
+    },
+    [],
+  );
 
   const logout = useCallback(() => {
-    localStorage.removeItem("nexus_erp_auth");
+    fbLogout();
+    persistUser(null);
     setUser(null);
     window.location.href = "/";
   }, []);
 
-  const value = useMemo(() => ({ user, login, register, logout }), [user, login, register, logout]);
+  const isAdmin = user?.role === "admin";
+  const isGerente = user?.role === "gerente" || user?.role === "admin";
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, login, register, logout, isAdmin, isGerente }),
+    [user, login, register, logout, isAdmin, isGerente],
   );
+
+  if (!ready) return null;
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -37,6 +37,11 @@ class AccountCreate(BaseModel):
     account_type: str
 
 
+class AccountUpdate(BaseModel):
+    name: str | None = None
+    account_type: str | None = None
+
+
 class GeneralLedgerSummary(BaseModel):
     total_debits: float
     total_credits: float

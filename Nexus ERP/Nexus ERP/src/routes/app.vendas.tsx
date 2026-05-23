@@ -1,45 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSales } from "@/hooks/useSales";
-import type { Sale } from "@/lib/types";
+import { useSalesList, useCreateSale, useUpdateSale, useDeleteSale } from "@/hooks/useSales";
 
 export const Route = createFileRoute("/app/vendas")({
   component: VendasPage,
 });
 
 function VendasPage() {
-  const { list, search, create } = useSales();
-  const [sales, setSales] = useState<Sale[]>([]);
+  const { data: sales, isLoading } = useSalesList();
+  const createSale = useCreateSale();
+  const updateSale = useUpdateSale();
+  const deleteSale = useDeleteSale();
+
   const [query, setQuery] = useState("");
   const [customer, setCustomer] = useState("");
   const [value, setValue] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const loadSales = async () => {
-    setLoading(true);
-    const data = query ? await search(query) : await list();
-    setSales(data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    loadSales();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editCustomer, setEditCustomer] = useState("");
+  const [editValue, setEditValue] = useState("");
 
   const handleSubmit = async () => {
     if (!customer || !value) return;
-    await create(customer, parseFloat(value));
+    await createSale.mutateAsync({ customer, total: parseFloat(value) });
     setCustomer("");
     setValue("");
-    loadSales();
   };
 
-  const handleSearch = () => {
-    loadSales();
+  const startEdit = (sale: { id: string; customer: string; total: number }) => {
+    setEditingId(sale.id);
+    setEditCustomer(sale.customer);
+    setEditValue(sale.total.toString());
   };
+
+  const saveEdit = async (id: string) => {
+    await updateSale.mutateAsync({ id, customer: editCustomer, total: parseFloat(editValue) });
+    setEditingId(null);
+  };
+
+  const filtered = query
+    ? sales?.filter((s) => s.customer.toLowerCase().includes(query.toLowerCase()))
+    : sales;
 
   return (
     <div className="p-8">
@@ -62,7 +65,7 @@ function VendasPage() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
-          <Button onClick={handleSubmit}>
+          <Button onClick={handleSubmit} disabled={createSale.isPending}>
             <Plus className="mr-2 h-4 w-4" />
             Registrar
           </Button>
@@ -79,12 +82,9 @@ function VendasPage() {
             className="pl-10"
           />
         </div>
-        <Button variant="secondary" onClick={handleSearch}>
-          Buscar
-        </Button>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex h-40 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
         </div>
@@ -102,26 +102,83 @@ function VendasPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Data
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {sales.map((sale) => (
+              {filtered?.map((sale) => (
                 <tr key={sale.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-6 py-4 text-sm">{sale.customer}</td>
-                  <td className="px-6 py-4 text-sm font-medium">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(sale.total)}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {new Date(sale.created_at).toLocaleDateString("pt-BR")}
-                  </td>
+                  {editingId === sale.id ? (
+                    <>
+                      <td className="px-6 py-4">
+                        <Input
+                          value={editCustomer}
+                          onChange={(e) => setEditCustomer(e.target.value)}
+                          className="h-8"
+                        />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Input
+                          type="number"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          className="h-8 w-32"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
+                        {new Date(sale.created_at).toLocaleDateString("pt-BR")}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => saveEdit(sale.id)}
+                            disabled={updateSale.isPending}
+                          >
+                            Salvar
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-6 py-4 text-sm">{sale.customer}</td>
+                      <td className="px-6 py-4 text-sm font-medium">
+                        {new Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        }).format(sale.total)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
+                        {new Date(sale.created_at).toLocaleDateString("pt-BR")}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => startEdit(sale)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-rose-400 hover:text-rose-300"
+                            onClick={() => deleteSale.mutate(sale.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
-              {sales.length === 0 && (
+              {(!filtered || filtered.length === 0) && (
                 <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Nenhuma venda registrada
                   </td>
                 </tr>

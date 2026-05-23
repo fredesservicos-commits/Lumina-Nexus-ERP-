@@ -12,6 +12,13 @@ class EmployeeCreate(BaseModel):
     tax_load_percent: float = 0.00
 
 
+class EmployeeUpdate(BaseModel):
+    department: str | None = None
+    base_salary: float | None = None
+    benefits_total: float | None = None
+    tax_load_percent: float | None = None
+
+
 class EmployeeResponse(BaseModel):
     id: str
     partner_id: str

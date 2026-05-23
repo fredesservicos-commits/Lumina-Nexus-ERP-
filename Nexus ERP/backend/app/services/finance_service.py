@@ -98,6 +98,27 @@ def create_ledger_entry(db: Session, data: GeneralLedgerCreate) -> GeneralLedger
     return ledger
 
 
+def update_account(db: Session, account_id: int, name: str | None = None, account_type: str | None = None) -> ChartOfAccounts:
+    account = db.query(ChartOfAccounts).filter(ChartOfAccounts.id == account_id).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
+    if name is not None:
+        account.name = name
+    if account_type is not None:
+        account.account_type = account_type
+    db.commit()
+    db.refresh(account)
+    return account
+
+
+def delete_account(db: Session, account_id: int) -> None:
+    account = db.query(ChartOfAccounts).filter(ChartOfAccounts.id == account_id).first()
+    if not account:
+        raise HTTPException(status_code=404, detail="Conta não encontrada")
+    db.delete(account)
+    db.commit()
+
+
 def get_summary(db: Session) -> dict:
     debits = db.query(func.coalesce(func.sum(LedgerItem.debit), 0)).scalar() or 0
     credits = db.query(func.coalesce(func.sum(LedgerItem.credit), 0)).scalar() or 0

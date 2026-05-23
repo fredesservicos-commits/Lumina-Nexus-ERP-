@@ -8,6 +8,11 @@ class SaleCreate(BaseModel):
     total: float
 
 
+class SaleUpdate(BaseModel):
+    customer: str | None = None
+    total: float | None = None
+
+
 class SaleResponse(BaseModel):
     id: str
     customer: str

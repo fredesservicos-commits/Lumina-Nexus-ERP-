@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,42 +13,37 @@ export const Route = createFileRoute("/app/rh")({
 });
 
 function RHPage() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const qc = useQueryClient();
+
+  const { data: employees, isLoading } = useQuery<Employee[]>({
+    queryKey: ["employees"],
+    queryFn: () => api.get<Employee[]>("/employees/list"),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: { department: string; salary: number }) =>
+      api.post("/employees/new", {
+        partner_id: "00000000-0000-0000-0000-000000000000",
+        department: data.department,
+        hire_date: new Date().toISOString().split("T")[0],
+        base_salary: data.salary,
+      }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["employees"] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.del(`/employees/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["employees"] }),
+  });
+
   const [department, setDepartment] = useState("");
   const [salary, setSalary] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const data = await api.get<Employee[]>("/employees/list");
-      setEmployees(data);
-    } catch {
-      console.error("Erro ao carregar funcionários");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const handleSubmit = async () => {
     if (!department || !salary) return;
-    try {
-      await api.post("/employees/new", {
-        partner_id: "00000000-0000-0000-0000-000000000000",
-        department,
-        hire_date: new Date().toISOString().split("T")[0],
-        base_salary: parseFloat(salary),
-      });
-      setDepartment("");
-      setSalary("");
-      load();
-    } catch {
-      console.error("Erro ao registrar funcionário");
-    }
+    await createMutation.mutateAsync({ department, salary: parseFloat(salary) });
+    setDepartment("");
+    setSalary("");
   };
 
   return (
@@ -78,7 +74,7 @@ function RHPage() {
             />
           </div>
           <div className="flex items-end">
-            <Button onClick={handleSubmit}>
+            <Button onClick={handleSubmit} disabled={createMutation.isPending}>
               <Plus className="mr-2 h-4 w-4" />
               Adicionar
             </Button>
@@ -86,7 +82,7 @@ function RHPage() {
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="flex h-40 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
         </div>
@@ -107,32 +103,43 @@ function RHPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Admissão
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {employees.map((emp) => (
+              {employees?.map((emp) => (
                 <tr key={emp.id} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 text-sm">{emp.department}</td>
                   <td className="px-6 py-4 text-sm">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(emp.base_salary)}
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+                      emp.base_salary,
+                    )}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(emp.monthly_cost)}
+                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+                      emp.monthly_cost,
+                    )}
                   </td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">
                     {new Date(emp.hire_date).toLocaleDateString("pt-BR")}
                   </td>
+                  <td className="px-6 py-4">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-rose-400 hover:text-rose-300"
+                      onClick={() => deleteMutation.mutate(emp.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
-              {employees.length === 0 && (
+              {(!employees || employees.length === 0) && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={5} className="px-6 py-12 text-center text-sm text-muted-foreground">
                     Nenhum funcionário cadastrado
                   </td>
                 </tr>
