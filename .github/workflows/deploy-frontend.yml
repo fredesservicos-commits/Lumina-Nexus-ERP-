@@ -7,12 +7,15 @@ on:
       - "Nexus ERP/Nexus ERP/**"
       - ".github/workflows/deploy-frontend.yml"
 
+env:
+  working_dir: Nexus ERP/Nexus ERP
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Nexus ERP/Nexus ERP
+        working-directory: ${{ env.working_dir }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,9 +24,9 @@ jobs:
         with:
           node-version: 22
           cache: "npm"
-          cache-dependency-path: Nexus ERP/Nexus ERP/package-lock.json
+          cache-dependency-path: "${{ env.working_dir }}/package-lock.json"
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
 
       - run: npm run build
 
