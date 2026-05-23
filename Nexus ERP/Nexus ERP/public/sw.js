@@ -5,7 +5,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) =>
-      cache.addAll(["/", "/index.html", "/manifest.json", "/icon.svg"]),
+      cache.addAll(["/", "/index.html", "/manifest.json", "/icon.svg", "/icon-192.png", "/icon-512.png"]),
     ),
   );
 });
