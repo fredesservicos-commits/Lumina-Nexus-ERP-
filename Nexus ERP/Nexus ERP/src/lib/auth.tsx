@@ -64,13 +64,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (!ready) {
-        setReady(true);
-      }
+      if (!ready) setReady(true);
     }, 3000);
 
     const unsub = onAuthChange(async (fbUser) => {
       clearTimeout(timeout);
+      setReady(true);
       try {
         if (fbUser) {
           const authUser = await buildAuthUser(fbUser, loadUser()?.role || undefined);
@@ -84,7 +83,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         persistUser(null);
         setUser(null);
       }
-      setReady(true);
     });
     return () => {
       clearTimeout(timeout);

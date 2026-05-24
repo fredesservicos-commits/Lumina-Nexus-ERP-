@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   TrendingUp,
@@ -42,11 +42,23 @@ export const Route = createFileRoute("/app/")({
 
 function DashboardPage() {
   const [showError, setShowError] = useState(false);
+  const loadingTimer = useRef<ReturnType<typeof setTimeout>>();
   const { data, isLoading, isError, refetch, isRefetching, error } = useDashboardSummary();
   const { data: recent } = useRecentTransactions();
 
+  useEffect(() => {
+    if (isLoading) {
+      loadingTimer.current = setTimeout(() => {
+        setShowError(true);
+      }, 15000);
+    } else {
+      clearTimeout(loadingTimer.current);
+    }
+    return () => clearTimeout(loadingTimer.current);
+  }, [isLoading]);
+
   const summaryCache = loadCache<typeof data>(CACHE_KEY);
-  const showLoading = isLoading && !summaryCache;
+  const showLoading = isLoading && !summaryCache && !showError;
   const showStale = isLoading && !!summaryCache;
 
   if (showLoading) {
@@ -57,14 +69,14 @@ function DashboardPage() {
     );
   }
 
-  if (isError && !summaryCache && !showError) {
+  if ((isError || showError) && !summaryCache) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
         <AlertCircle className="h-12 w-12 text-rose-400" />
         <p className="text-sm text-muted-foreground">
           Não foi possível carregar o Dashboard. Verifique sua conexão.
         </p>
-        <Button onClick={() => refetch()} disabled={isRefetching}>
+        <Button onClick={() => { setShowError(false); refetch(); }} disabled={isRefetching}>
           <RefreshCw className={cn("mr-2 h-4 w-4", isRefetching && "animate-spin")} />
           Tentar novamente
         </Button>

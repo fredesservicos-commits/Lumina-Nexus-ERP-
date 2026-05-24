@@ -1,20 +1,29 @@
+import { auth } from "@/lib/firebase/auth";
+
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const TOKEN_CACHE: { token: string; expiry: number } = { token: "", expiry: 0 };
+
+async function getIdTokenWithTimeout(timeoutMs = 5000): Promise<string> {
+  const fbUser = auth.currentUser;
+  if (!fbUser) throw new Error("No user");
+  return Promise.race([
+    fbUser.getIdToken(),
+    new Promise<string>((_, reject) =>
+      setTimeout(() => reject(new Error("getIdToken timeout")), timeoutMs),
+    ),
+  ]);
+}
 
 async function getToken(): Promise<string | null> {
   if (TOKEN_CACHE.token && Date.now() < TOKEN_CACHE.expiry) {
     return TOKEN_CACHE.token;
   }
   try {
-    const { auth } = await import("@/lib/firebase/auth");
-    const fbUser = auth.currentUser;
-    if (fbUser) {
-      const token = await fbUser.getIdToken();
-      TOKEN_CACHE.token = token;
-      TOKEN_CACHE.expiry = Date.now() + 300000;
-      return token;
-    }
+    const token = await getIdTokenWithTimeout();
+    TOKEN_CACHE.token = token;
+    TOKEN_CACHE.expiry = Date.now() + 300000;
+    return token;
   } catch {}
   try {
     const raw = localStorage.getItem("nexus_erp_auth");
@@ -41,12 +50,12 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
-  const token = await getToken();
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
   try {
+    const token = await getToken();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
     const res = await fetch(url, { headers, signal: controller.signal, ...options });
     if (res.status === 204) return undefined as T;
     if (!res.ok) {
