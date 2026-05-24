@@ -8,3 +8,4 @@ __pycache__/
 nexus_erp.db
 *.txt
 *.log
+**/.firebase/
