@@ -50,7 +50,7 @@ function DashboardPage() {
     if (isLoading) {
       loadingTimer.current = setTimeout(() => {
         setShowError(true);
-      }, 15000);
+      }, 8000);
     } else {
       clearTimeout(loadingTimer.current);
     }

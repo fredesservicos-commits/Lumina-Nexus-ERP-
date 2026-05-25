@@ -24,9 +24,13 @@ function VendasPage() {
 
   const handleSubmit = async () => {
     if (!customer || !value) return;
-    await createSale.mutateAsync({ customer, total: parseFloat(value) });
-    setCustomer("");
-    setValue("");
+    try {
+      await createSale.mutateAsync({ customer, total: parseFloat(value) });
+      setCustomer("");
+      setValue("");
+    } catch {
+      /* erro tratado pelo mutateAsync internamente */
+    }
   };
 
   const startEdit = (sale: { id: string; customer: string; total: number }) => {
@@ -36,8 +40,12 @@ function VendasPage() {
   };
 
   const saveEdit = async (id: string) => {
-    await updateSale.mutateAsync({ id, customer: editCustomer, total: parseFloat(editValue) });
-    setEditingId(null);
+    try {
+      await updateSale.mutateAsync({ id, customer: editCustomer, total: parseFloat(editValue) });
+      setEditingId(null);
+    } catch {
+      /* erro tratado pelo mutateAsync internamente */
+    }
   };
 
   const filtered = query

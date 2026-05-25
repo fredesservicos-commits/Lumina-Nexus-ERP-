@@ -1,8 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { Loader2 } from "lucide-react";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -33,12 +32,10 @@ function AppLayout() {
   const { pathname } = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const redirected = useRef(false);
 
   useEffect(() => {
-    if (!user && !redirected.current) {
-      redirected.current = true;
-      navigate({ to: "/login" });
+    if (!user) {
+      navigate({ to: "/login", replace: true });
     }
   }, [user, navigate]);
 
@@ -47,11 +44,7 @@ function AppLayout() {
   };
 
   if (!user) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return null;
   }
 
   return (

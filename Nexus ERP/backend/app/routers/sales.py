@@ -21,25 +21,22 @@ def create_sale(data: SaleCreate, db: Session = Depends(get_db), current_user: U
     )
 
 
-@router.get("/list")
-def get_sales(page: int = Query(1, ge=1), per_page: int = Query(20, ge=1, le=100), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    from app.core.pagination import paginate
+@router.get("/list", response_model=list[SaleResponse])
+def get_sales(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     from app.models.operacional import Document
     query = db.query(Document).filter(Document.doc_type == "SALES_ORDER")
     if current_user.company_id:
         query = query.filter(Document.company_id == current_user.company_id)
-    query = query.order_by(Document.created_at.desc())
-    result = paginate(query, page, per_page)
-    result["data"] = [
+    query = query.order_by(Document.created_at.desc()).all()
+    return [
         SaleResponse(
             id=s.id,
             customer=s.description.replace("Venda - ", "") if s.description else "",
             total=s.total_amount,
             created_at=s.created_at,
         )
-        for s in result["data"]
+        for s in query
     ]
-    return result
 
 
 @router.get("/search")

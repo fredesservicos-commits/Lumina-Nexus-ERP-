@@ -63,28 +63,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     const timeout = setTimeout(() => {
-      if (!ready) setReady(true);
-    }, 3000);
+      if (mounted && !ready) setReady(true);
+    }, 5000);
 
     const unsub = onAuthChange(async (fbUser) => {
+      if (!mounted) return;
       clearTimeout(timeout);
       setReady(true);
       try {
         if (fbUser) {
           const authUser = await buildAuthUser(fbUser, loadUser()?.role || undefined);
-          persistUser(authUser);
-          setUser(authUser);
+          if (mounted) {
+            persistUser(authUser);
+            setUser(authUser);
+          }
         } else {
+          if (mounted) {
+            persistUser(null);
+            setUser(null);
+          }
+        }
+      } catch {
+        if (mounted) {
           persistUser(null);
           setUser(null);
         }
-      } catch {
-        persistUser(null);
-        setUser(null);
       }
     });
     return () => {
+      mounted = false;
       clearTimeout(timeout);
       unsub();
     };
