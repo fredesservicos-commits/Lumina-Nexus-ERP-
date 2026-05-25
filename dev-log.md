@@ -26,3 +26,13 @@
   - **(A)** `app.tsx`: Substituído spinner full-screen por `return null` — não bloqueia mais a UI. Removido `useRef(redirected)` — agora usa `navigate({ to: "/login", replace: true })` diretamente no `useEffect`.
   - **(B)** `auth.tsx`: Adicionado flag `mounted` para cancelar operações assíncronas após desmontagem. Timeout de ready aumentado de 3s para 5s.
   - **(C)** `app.index.tsx`: Timeout de erro do dashboard reduzido de 15s para 8s, dando feedback mais rápido ao usuário.
+- [2026-05-25] **TERCEIRA INVESTIGAÇÃO — FREEZE TOTAL (F12 não abre)**: Usuário reportou freeze tão severo que impede até DevTools. Investigação revelou CICLO DE RENDER INFINITO:
+  - **(A)** `TanStack Router scrollRestoration: true` → `window.scrollTo()` → evento `scroll` → `Header setScrolled()` → re-render → Router restaura scroll novamente → LOOP SÍNCRONO na thread principal.
+  - **(B)** `onAuthStateChanged` do Firebase dispara múltiplas vezes durante inicialização (null → user), cada disparo aciona `setUser()`, alimentando o ciclo de re-render.
+  - **(C)** Service Worker com cache imutável (`v1`) servia assets antigos mesmo após deploy.
+  - **(D)** `loadUser()` sem validação de estrutura — localStorage corrompido passava como `AuthUser` válido, causando estado inconsistente.
+- [2026-05-25] **CORREÇÃO (Freeze Total)**:
+  - **(A)** `router.tsx`: `scrollRestoration: false` — quebra o ciclo scroll → re-render.
+  - **(B)** `auth.tsx`: Adicionado `callbackCalled` guard no `onAuthChange` — garante que o Firebase só processa UM callback por montagem, eliminando cascata de `setUser()`.
+  - **(C)** `auth.tsx`: `loadUser()` agora valida estrutura do dado (email, localId obrigatórios) e limpa localStorage corrompido automaticamente.
+  - **(D)** `sw.js`: Cache versionada para `v2` — força nova cache no próximo install.

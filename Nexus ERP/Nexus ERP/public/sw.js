@@ -1,5 +1,5 @@
-const CACHE_NAME = "lumina-nexus-erp-v1";
-const STATIC_CACHE = "lumina-nexus-erp-static-v1";
+const CACHE_NAME = "lumina-nexus-erp-v2";
+const STATIC_CACHE = "lumina-nexus-erp-static-v2";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

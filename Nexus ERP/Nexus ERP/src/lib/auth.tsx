@@ -32,8 +32,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 function loadUser(): AuthUser | null {
   try {
     const raw = localStorage.getItem("nexus_erp_auth");
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || !parsed.email || !parsed.localId) {
+      localStorage.removeItem("nexus_erp_auth");
+      return null;
+    }
+    return parsed as AuthUser;
   } catch {
+    localStorage.removeItem("nexus_erp_auth");
     return null;
   }
 }
@@ -64,12 +71,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let callbackCalled = false;
     const timeout = setTimeout(() => {
-      if (mounted && !ready) setReady(true);
+      if (mounted && !ready) { callbackCalled = true; setReady(true); }
     }, 5000);
 
     const unsub = onAuthChange(async (fbUser) => {
-      if (!mounted) return;
+      if (!mounted || callbackCalled) return;
+      callbackCalled = true;
       clearTimeout(timeout);
       setReady(true);
       try {
@@ -94,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       mounted = false;
+      callbackCalled = true;
       clearTimeout(timeout);
       unsub();
     };
