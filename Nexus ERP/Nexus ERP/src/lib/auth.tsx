@@ -71,14 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    let callbackCalled = false;
     const timeout = setTimeout(() => {
-      if (mounted && !ready) { callbackCalled = true; setReady(true); }
+      if (mounted && !ready) setReady(true);
     }, 5000);
 
     const unsub = onAuthChange(async (fbUser) => {
-      if (!mounted || callbackCalled) return;
-      callbackCalled = true;
+      if (!mounted) return;
       clearTimeout(timeout);
       setReady(true);
       try {
@@ -103,7 +101,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       mounted = false;
-      callbackCalled = true;
       clearTimeout(timeout);
       unsub();
     };

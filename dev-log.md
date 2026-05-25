@@ -33,6 +33,6 @@
   - **(D)** `loadUser()` sem validação de estrutura — localStorage corrompido passava como `AuthUser` válido, causando estado inconsistente.
 - [2026-05-25] **CORREÇÃO (Freeze Total)**:
   - **(A)** `router.tsx`: `scrollRestoration: false` — quebra o ciclo scroll → re-render.
-  - **(B)** `auth.tsx`: Adicionado `callbackCalled` guard no `onAuthChange` — garante que o Firebase só processa UM callback por montagem, eliminando cascata de `setUser()`.
+  - **(B)** `auth.tsx`: ~~Adicionado `callbackCalled` guard no `onAuthChange`~~ — **REVERTIDO** porque quebrava login/registro (impede `setUser()` após auth state mudar). O `scrollRestoration: false` já elimina a cascata.
   - **(C)** `auth.tsx`: `loadUser()` agora valida estrutura do dado (email, localId obrigatórios) e limpa localStorage corrompido automaticamente.
   - **(D)** `sw.js`: Cache versionada para `v2` — força nova cache no próximo install.
