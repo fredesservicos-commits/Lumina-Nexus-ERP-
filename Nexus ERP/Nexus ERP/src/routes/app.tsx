@@ -30,14 +30,14 @@ export const Route = createFileRoute("/app")({
 
 function AppLayout() {
   const { pathname } = useLocation();
-  const { user, logout } = useAuth();
+  const { user, isInitialized, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    if (isInitialized && !user) {
       navigate({ to: "/login", replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isInitialized, navigate]);
 
   const handleLogout = () => {
     logout();

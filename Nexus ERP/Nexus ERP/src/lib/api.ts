@@ -1,51 +1,19 @@
-import { auth } from "@/lib/firebase/auth";
+import { getSupabaseSession } from "@/lib/supabase";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const TOKEN_CACHE: { token: string; expiry: number } = { token: "", expiry: 0 };
-
-async function getIdTokenWithTimeout(timeoutMs = 5000): Promise<string> {
-  const fbUser = auth.currentUser;
-  if (!fbUser) throw new Error("No user");
-  return Promise.race([
-    fbUser.getIdToken(),
-    new Promise<string>((_, reject) =>
-      setTimeout(() => reject(new Error("getIdToken timeout")), timeoutMs),
-    ),
-  ]);
+export class ApiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
 }
 
 async function getToken(): Promise<string | null> {
-  if (TOKEN_CACHE.token && Date.now() < TOKEN_CACHE.expiry) {
-    return TOKEN_CACHE.token;
-  }
-  try {
-    const token = await getIdTokenWithTimeout();
-    TOKEN_CACHE.token = token;
-    TOKEN_CACHE.expiry = Date.now() + 300000;
-    return token;
-  } catch {}
-  try {
-    const raw = localStorage.getItem("nexus_erp_auth");
-    if (!raw) return null;
-    const token = JSON.parse(raw).idToken || null;
-    if (token) {
-      TOKEN_CACHE.token = token;
-      TOKEN_CACHE.expiry = Date.now() + 300000;
-    }
-    return token;
-  } catch {
+  const { data, error } = await getSupabaseSession();
+  if (error || !data.session || !data.session.access_token) {
     return null;
   }
-}
-
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
+  return data.session.access_token;
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {

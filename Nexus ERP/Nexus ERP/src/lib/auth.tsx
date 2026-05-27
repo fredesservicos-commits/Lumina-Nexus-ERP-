@@ -1,25 +1,25 @@
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from "react";
+import { toast } from "sonner";
 import {
-  auth,
-  login as fbLogin,
-  register as fbRegister,
-  logout as fbLogout,
-  onAuthChange,
-} from "@/lib/firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/firestore";
+  getSupabaseSession,
+  onSupabaseAuthChange,
+  signInWithSupabase,
+  signUpWithSupabase,
+  signOutFromSupabase,
+} from "@/lib/supabase";
 
 export interface AuthUser {
   email: string;
   localId: string;
-  idToken: string;
-  refreshToken: string;
+  idToken?: string;
+  refreshToken?: string;
   displayName?: string | null;
   role?: string | null;
 }
 
 interface AuthContextType {
   user: AuthUser | null;
+  isInitialized: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   register: (email: string, password: string, displayName?: string) => Promise<AuthUser>;
   logout: () => void;
@@ -38,7 +38,12 @@ function loadUser(): AuthUser | null {
       localStorage.removeItem("nexus_erp_auth");
       return null;
     }
-    return parsed as AuthUser;
+    return {
+      email: parsed.email,
+      localId: parsed.localId,
+      displayName: parsed.displayName || null,
+      role: parsed.role || null,
+    };
   } catch {
     localStorage.removeItem("nexus_erp_auth");
     return null;
@@ -47,26 +52,37 @@ function loadUser(): AuthUser | null {
 
 function persistUser(user: AuthUser | null) {
   if (user) {
-    localStorage.setItem("nexus_erp_auth", JSON.stringify(user));
+    localStorage.setItem(
+      "nexus_erp_auth",
+      JSON.stringify({
+        email: user.email,
+        localId: user.localId,
+        displayName: user.displayName || null,
+        role: user.role || null,
+      }),
+    );
   } else {
     localStorage.removeItem("nexus_erp_auth");
   }
 }
 
-async function buildAuthUser(fbUser: import("firebase/auth").User, role?: string): Promise<AuthUser> {
-  const token = await fbUser.getIdToken();
+function buildAuthUser(session: Awaited<ReturnType<typeof getSupabaseSession>>["data"]["session"], role?: string): AuthUser {
+  if (!session || !session.user) {
+    throw new Error("Session inválida");
+  }
+
   return {
-    email: fbUser.email || "",
-    localId: fbUser.uid,
-    idToken: token,
-    refreshToken: fbUser.refreshToken || "",
-    displayName: fbUser.displayName,
+    email: session.user.email || "",
+    localId: session.user.id,
+    idToken: session.access_token,
+    refreshToken: session.refresh_token || "",
+    displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || null,
     role: role || null,
   };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => loadUser());
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -75,46 +91,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mounted && !ready) setReady(true);
     }, 5000);
 
-    const unsub = onAuthChange(async (fbUser) => {
+    async function restoreSession() {
+      const { data, error } = await getSupabaseSession();
       if (!mounted) return;
       clearTimeout(timeout);
       setReady(true);
-      try {
-        if (fbUser) {
-          const authUser = await buildAuthUser(fbUser, loadUser()?.role || undefined);
-          if (mounted) {
-            persistUser(authUser);
-            setUser(authUser);
-          }
-        } else {
-          if (mounted) {
-            persistUser(null);
-            setUser(null);
-          }
-        }
-      } catch {
-        if (mounted) {
-          persistUser(null);
-          setUser(null);
-        }
+      if (error || !data.session || !data.session.user) {
+        persistUser(null);
+        setUser(null);
+        return;
+      }
+      const authUser = buildAuthUser(data.session, loadUser()?.role || undefined);
+      persistUser(authUser);
+      setUser(authUser);
+    }
+
+    restoreSession().catch(() => {
+      if (mounted) {
+        persistUser(null);
+        setUser(null);
+        setReady(true);
       }
     });
+
+    const { data: { subscription } } = onSupabaseAuthChange(async (_event, session) => {
+      if (!mounted) return;
+      setReady(true);
+      if (!session || !session.user) {
+        persistUser(null);
+        setUser(null);
+        return;
+      }
+      const authUser = buildAuthUser(session, loadUser()?.role || undefined);
+      persistUser(authUser);
+      setUser(authUser);
+    });
+
     return () => {
       mounted = false;
       clearTimeout(timeout);
-      unsub();
+      subscription.unsubscribe();
     };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
-    const credential = await fbLogin(email, password);
-    const fbUser = credential.user;
-    let role = "operador";
-    try {
-      const snap = await getDoc(doc(db, "users", fbUser.uid));
-      if (snap.exists()) role = snap.data().role || "operador";
-    } catch {}
-    const authUser = await buildAuthUser(fbUser, role);
+    const { data, error } = await signInWithSupabase(email, password);
+    if (error || !data.session || !data.session.user) {
+      const message = error?.message || "Erro ao autenticar";
+      toast.error(message);
+      throw new Error(message);
+    }
+
+    const authUser = buildAuthUser(data.session, loadUser()?.role || undefined);
     persistUser(authUser);
     setUser(authUser);
     return authUser;
@@ -122,16 +150,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async (email: string, password: string, displayName?: string): Promise<AuthUser> => {
-      const credential = await fbRegister(email, password);
-      const fbUser = credential.user;
-      const display = displayName || fbUser.email?.split("@")[0] || "";
-      await setDoc(doc(db, "users", fbUser.uid), {
-        email: fbUser.email,
-        displayName: display,
-        role: "operador",
-        createdAt: new Date().toISOString(),
-      }).catch(() => {});
-      const authUser = await buildAuthUser(fbUser, "operador");
+      const { data, error } = await signUpWithSupabase(email, password, displayName);
+      if (error) {
+        const code = error.message || "";
+        let message = "Erro ao cadastrar";
+        if (typeof code === "string") {
+          if (code.includes("already registered") || code.includes("duplicate")) {
+            message = "Este e-mail já está em uso.";
+          } else if (code.includes("invalid email")) {
+            message = "E-mail inválido.";
+          } else if (code.includes("Password should be at least")) {
+            message = "A senha não atende os requisitos mínimos.";
+          } else if (code.includes("network")) {
+            message = "Falha de rede. Verifique sua conexão e tente novamente.";
+          } else {
+            message = error.message;
+          }
+        }
+        toast.error(message);
+        throw new Error(message);
+      }
+      if (!data.session || !data.user) {
+        const message = "Falha ao finalizar o cadastro. Tente novamente.";
+        toast.error(message);
+        throw new Error(message);
+      }
+
+      const authUser = buildAuthUser(data.session, "operador");
       persistUser(authUser);
       setUser(authUser);
       return authUser;
@@ -139,8 +184,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  const logout = useCallback(() => {
-    fbLogout();
+  const logout = useCallback(async () => {
+    await signOutFromSupabase();
     persistUser(null);
     setUser(null);
     window.location.href = "/";
@@ -150,8 +195,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isGerente = user?.role === "gerente" || user?.role === "admin";
 
   const value = useMemo(
-    () => ({ user, login, register, logout, isAdmin, isGerente }),
-    [user, login, register, logout, isAdmin, isGerente],
+    () => ({ user, isInitialized: ready, login, register, logout, isAdmin, isGerente }),
+    [user, ready, login, register, logout, isAdmin, isGerente],
   );
 
   if (!ready) {

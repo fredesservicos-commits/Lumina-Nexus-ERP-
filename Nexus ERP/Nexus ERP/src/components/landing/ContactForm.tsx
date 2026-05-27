@@ -9,17 +9,22 @@ import { Textarea } from "@/components/ui/textarea";
 export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      // Simula envio; se for substituído por chamada real, await a promise aqui
+      await new Promise((resolve) => setTimeout(resolve, 700));
       toast.success("Solicitação enviada!", {
         description: "Nosso time entrará em contato em até 1 dia útil.",
         icon: <CheckCircle2 className="h-4 w-4 text-success" />,
       });
       (e.target as HTMLFormElement).reset();
-    }, 700);
+    } catch (err) {
+      toast.error("Erro ao enviar solicitação. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
