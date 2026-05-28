@@ -17,5 +17,5 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(20), default="operador", comment="admin | gerente | operador")
     company_id: Mapped[str | None] = mapped_column(String, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    firebase_local_id: Mapped[str | None] = mapped_column(String(128), nullable=True, unique=True)
+    supabase_uid: Mapped[str | None] = mapped_column(String(128), nullable=True, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
