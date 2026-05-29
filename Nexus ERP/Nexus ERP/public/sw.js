@@ -51,7 +51,13 @@ self.addEventListener("fetch", (event) => {
 
   if (url.pathname.startsWith("/api/")) return;
 
+  // Se for uma requisição para o Supabase (API), ignore o cache
+  if (url.hostname.includes("supabase.co")) {
+    return event.respondWith(fetch(request));
+  }
+
+  // Comportamento padrão para outros recursos
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request)),
+    caches.match(request).then((cached) => cached || fetch(request).catch(() => new Response("Offline", { status: 503 })))
   );
 });
