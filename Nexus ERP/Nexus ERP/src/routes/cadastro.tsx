@@ -93,7 +93,7 @@ function CadastroPage() {
             />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
-          {success && <p className="text-sm text-green-500">Conta criada com sucesso!</p>}
+          {success && <p className="text-sm text-green-500">Conta criada! Se necessário, confirme seu e-mail para fazer login.</p>}
           <button
             type="submit"
             disabled={loading}

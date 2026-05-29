@@ -170,10 +170,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         toast.error(message);
         throw new Error(message);
       }
-      if (!data.session || !data.user) {
+      if (!data.user) {
         const message = "Falha ao finalizar o cadastro. Tente novamente.";
         toast.error(message);
         throw new Error(message);
+      }
+
+      if (!data.session) {
+        toast.success("Cadastro realizado! Verifique seu e-mail para confirmar a conta se necessário.");
+        return {
+          email: data.user.email || "",
+          localId: data.user.id,
+          displayName: displayName || data.user.email?.split("@")[0] || null,
+          role: "operador",
+        };
       }
 
       const authUser = buildAuthUser(data.session, "operador");
