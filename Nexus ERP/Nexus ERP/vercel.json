@@ -11,8 +11,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://lumina-nexus-erp-production.up.railway.app/$1"
+      "source": "/api/:path*",
+      "destination": "https://lumina-nexus-erp-production.up.railway.app/:path*"
     },
     {
       "source": "/(.*)",
