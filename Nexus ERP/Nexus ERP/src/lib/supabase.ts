@@ -22,6 +22,9 @@ export function signInWithSupabase(email: string, password: string) {
 }
 
 export function signUpWithSupabase(email: string, password: string, displayName?: string) {
+  // Use window.location.origin to dynamically redirect back to the correct domain (Vercel or localhost)
+  const redirectTo = typeof window !== "undefined" ? window.location.origin : undefined;
+
   return supabase.auth.signUp({
     email,
     password,
@@ -29,6 +32,7 @@ export function signUpWithSupabase(email: string, password: string, displayName?
       data: {
         full_name: displayName,
       },
+      emailRedirectTo: redirectTo,
     },
   });
 }
