@@ -25,13 +25,13 @@ const items = [
 
 export function Differentials() {
   return (
-    <section className="relative border-y border-border bg-card/30 py-24 sm:py-32">
+    <section id="diferenciais" className="relative border-y border-border bg-card/30 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
             Por que Nexus
           </span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">
             Construído para quem leva <span className="text-gradient">contabilidade a sério</span>
           </h2>
         </div>
@@ -42,11 +42,13 @@ export function Differentials() {
             return (
               <div
                 key={it.title}
-                className="rounded-2xl border border-border bg-background/40 p-6 transition-all hover:border-accent/40"
+                className="group rounded-2xl border border-white/5 bg-background/40 p-8 backdrop-blur-md transition-all hover:bg-card/40 hover:border-primary/30 hover:translate-y-[-4px]"
               >
-                <Icon className="h-6 w-6 text-accent" />
-                <h3 className="mt-4 text-base font-semibold">{it.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{it.desc}</p>
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary transition-all group-hover:bg-gradient-primary group-hover:text-primary-foreground group-hover:shadow-glow">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-bold tracking-tight">{it.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">{it.desc}</p>
               </div>
             );
           })}

@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "#modulos", label: "Módulos" },
+  { href: "#diferenciais", label: "Diferenciais" },
   { href: "#fases", label: "Fases" },
-  { href: "#dashboard", label: "Dashboard" },
   { href: "#planos", label: "Planos" },
   { href: "#faq", label: "FAQ" },
 ];
